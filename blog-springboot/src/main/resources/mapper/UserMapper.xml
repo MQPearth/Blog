@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzx.dao.UserDao">
+
+    <resultMap id="User" type="User">
+        <id property="id" column="user_id"/>
+        <result property="name" column="user_name"/>
+        <result property="password" column="user_password"/>
+        <result property="mail" column="user_mail"/>
+        <result property="state" column="user_state"/>
+        <result property="login.ip" column="login_ip"/>
+        <result property="login.time" column="login_time"/>
+
+    </resultMap>
+
+
+    <select id="findUserByName" parameterType="String" resultMap="User">
+        SELECT user_id , user_name,user_password,user_mail,user_state
+        from user
+        WHERE user_name = #{value}
+    </select>
+
+    <select id="findUserByMail" parameterType="String" resultMap="User">
+        SELECT user_id , user_name,user_password,user_mail,user_state
+        from user
+        WHERE user_mail = #{value}
+    </select>
+
+    <!--主键自增，保存完后会自动返回主键id -->
+    <insert id="saveUser" parameterType="User" useGeneratedKeys="true" keyProperty="id" keyColumn="user_id">
+        INSERT INTO user VALUES (null,#{name},#{password},#{mail},#{state})
+    </insert>
+
+    <update id="updateUserState" parameterType="User">
+        update user
+        set user_state = #{state}
+        WHERE user_id = #{id}
+    </update>
+
+    <update id="updateUserPasswordById" parameterType="User">
+        UPDATE user
+        SET user_password = #{password}
+        WHERE user_id = #{id}
+    </update>
+
+    <update id="updateUserMailById" parameterType="User">
+        UPDATE user
+        SET user_mail = #{mail}
+        WHERE user_id = #{id}
+    </update>
+
+    <select id="findUserById" parameterType="Integer" resultMap="User">
+        SELECT user_id , user_name,user_password,user_mail,user_state
+        from user
+        WHERE user_id = #{value}
+    </select>
+
+    <select id="getUserCount" resultType="Long">
+        SELECT COUNT(1)
+        FROM user
+    </select>
+
+    <select id="findUser" resultMap="User">
+        SELECT u.user_id,user_name,user_mail,user_state,l.login_ip,l.login_time
+        FROM user u LEFT JOIN login l on u.user_id = l.user_id
+        LIMIT #{start},#{showCount}
+    </select>
+
+    <select id="searchUserByName" resultMap="User">
+        SELECT u.user_id,user_name,user_mail,user_state,l.login_ip,l.login_time
+        FROM user u LEFT JOIN login l on u.user_id = l.user_id
+        WHERE user_name LIKE '%${userName}%'
+        LIMIT #{start},#{showCount}
+    </select>
+    
+    
+    <select id="getUserCountByName" parameterType="String" resultType="Long">
+        SELECT COUNT(1)
+        FROM user
+        WHERE user_name LIKE '%${value}%'
+    </select>
+
+
+</mapper>

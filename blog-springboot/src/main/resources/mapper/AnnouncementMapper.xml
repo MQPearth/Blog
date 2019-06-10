@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzx.dao.AnnouncementDao">
+
+    <resultMap id="Announcement" type="Announcement">
+        <id property="id" column="announcement_id"/>
+        <result property="title" column="announcement_title"/>
+        <result property="body" column="announcement_body"/>
+        <result property="top" column="announcement_top"/>
+    </resultMap>
+
+    <insert id="saveAnnouncement" parameterType="Announcement">
+        INSERT INTO announcement
+        VALUES (null,#{title},#{body},#{top})
+    </insert>
+
+    <delete id="deleteAnnouncementById" parameterType="Integer">
+        DELETE FROM announcement
+        WHERE announcement_id = #{value}
+    </delete>
+
+    <update id="updateAnnouncementTop" parameterType="Announcement">
+        UPDATE announcement
+        SET announcement_top = #{top}
+        WHERE announcement_id = #{id}
+    </update>
+
+    <select id="getAnnouncementCount" resultType="Long">
+        SELECT COUNT(1)
+        FROM  announcement
+    </select>
+    
+    <select id="findAnnouncement" resultMap="Announcement">
+        SELECT announcement_id,announcement_title,announcement_body,announcement_top
+        FROM announcement
+        ORDER BY announcement_top
+        LIMIT #{start},#{showCount}
+    </select>
+
+</mapper>

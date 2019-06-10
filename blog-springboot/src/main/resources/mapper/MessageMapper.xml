@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzx.dao.MessageDao">
+
+    <resultMap id="Message" type="Message">
+        <id property="id" column="message_id"/>
+        <result property="name" column="message_name"/>
+        <result property="body" column="message_body"/>
+    </resultMap>
+
+    <select id="findMessageByName" parameterType="String" resultMap="Message">
+        SELECT message_id,message_name,message_body
+        FROM message
+        WHERE message_name = #{value}
+    </select>
+
+    <insert id="saveMessage" parameterType="Message">
+        INSERT INTO message
+        VALUES (null,#{name},#{body})
+    </insert>
+
+    <delete id="deleteMessageById" parameterType="Integer">
+        DELETE FROM message
+        WHERE message_id = #{value}
+    </delete>
+
+    <select id="getMessageCount" resultType="Long">
+        SELECT COUNT(1)
+        FROM message
+    </select>
+
+    <select id="findMessage" resultMap="Message">
+        SELECT message_id,message_name,message_body
+        FROM message
+        ORDER BY message_id DESC
+        LIMIT #{start},#{showCount}
+    </select>
+</mapper>

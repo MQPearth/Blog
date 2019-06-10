@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzx.dao.ReplyDao">
+
+    <resultMap id="Reply" type="Reply">
+        <id property="id" column="reply_id"/>
+        <result property="body" column="reply_body"/>
+        <result property="time" column="reply_time"/>
+        <result property="user.id" column="user_id"/>
+        <result property="user.name" column="user_name"/>
+        <result property="discuss.id" column="discuss_id"/>
+        <result property="reply.id" column="reply_rootid"/>
+    </resultMap>
+
+    <insert id="saveReply" parameterType="Reply">
+        INSERT INTO reply
+        VALUES (null,#{body},#{time},#{user.id},#{discuss.id},#{reply.id})
+    </insert>
+
+    <select id="findReplyById" parameterType="Integer" resultMap="Reply">
+        SELECT reply_id,reply_body,reply_time,u.user_id,u.user_name,r.discuss_id,r.reply_rootid
+        FROM reply r LEFT JOIN user u on r.user_id = u.user_id LEFT JOIN discuss d on r.discuss_id = d.discuss_id
+        WHERE r.reply_id = #{value}
+    </select>
+
+    <delete id="deleteReplyById" parameterType="Integer">
+        DELETE FROM reply
+        WHERE reply_id = #{value}
+    </delete>
+
+    <select id="findReplyByDiscussId" parameterType="Integer" resultMap="Reply">
+        SELECT reply_id,reply_body,reply_time,u.user_id,u.user_name,r.discuss_id,r.reply_rootid
+        FROM reply r LEFT JOIN user u on r.user_id = u.user_id LEFT JOIN discuss d on r.discuss_id = d.discuss_id
+        WHERE r.discuss_id = #{value}
+        ORDER BY r.reply_time
+    </select>
+
+    <delete id="deleteReplyByDiscussId" parameterType="Integer">
+        DELETE FROM reply
+        WHERE discuss_id = #{value}
+    </delete>
+
+</mapper>

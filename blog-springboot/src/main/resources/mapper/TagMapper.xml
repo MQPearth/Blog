@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzx.dao.TagDao">
+
+    <resultMap id="Tag" type="Tag">
+        <id property="id" column="tag_id"/>
+        <result property="name" column="tag_name"/>
+        <result property="user.id" column="user_id"/>
+    </resultMap>
+
+    <insert id="saveTag" parameterType="Tag">
+        INSERT INTO tag
+        VALUES(null,#{name},#{user.id})
+    </insert>
+
+    <update id="updateTagName" parameterType="Tag">
+        UPDATE tag
+        SET tag_name = #{name}
+        WHERE tag_id = #{id}
+    </update>
+
+    <delete id="deleteTag" parameterType="Integer">
+        DELETE FROM tag
+        WHERE tag_id = #{value}
+    </delete>
+
+    <select id="findTagById" parameterType="Integer" resultMap="Tag">
+        SELECT tag_id,tag_name,user_id
+        FROM tag
+        WHERE tag_id = #{value}
+    </select>
+
+    <select id="findTagByUserId" parameterType="Integer" resultMap="Tag">
+        SELECT tag_id,tag_name,user_id
+        FROM tag
+        WHERE user_id = #{value}
+    </select>
+
+    <select id="findTagByBlogId" parameterType="Integer" resultMap="Tag">
+        SELECT t.tag_id,t.tag_name
+        FROM blog_tag bt LEFT JOIN tag t on bt.tag_id = t.tag_id
+        WHERE blog_id = #{value}
+    </select>
+
+    <delete id="deleteTagByBlogId" parameterType="Integer">
+        DELETE FROM blog_tag
+        WHERE blog_id = #{value}
+    </delete>
+
+    <delete id="deleteTagByTagId" parameterType="Integer">
+        DELETE FROM blog_tag
+        WHERE tag_id = #{value}
+    </delete>
+
+</mapper>

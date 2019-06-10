@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzx.dao.MailkeyDao">
+
+    <resultMap id="Mailkey" type="Mailkey">
+        <id property="id" column="mailkey_id" />
+        <result property="code" column="mailkey_code"/>
+        <result property="mail" column="mailkey_mail"/>
+        <result property="sendTime" column="mailkey_sendTime"/>
+    </resultMap>
+
+    <insert id="saveMailkey" parameterType="Mailkey">
+        INSERT INTO mailkey
+        values(null,#{mail},#{code},#{sendTime})
+    </insert>
+
+    <select id="findMailkeyByMail" parameterType="String" resultMap="Mailkey">
+        SELECT mailkey_id,mailkey_mail,mailkey_code,mailkey_sendTime
+        from mailkey WHERE mailkey_mail = #{value}
+    </select>
+    <select id="findMailkeyByCodeAndMail" resultMap="Mailkey">
+        SELECT mailkey_id,mailkey_mail,mailkey_code,mailkey_sendTime
+        from mailkey WHERE mailkey_code = #{code} and mailkey_mail = #{mail}
+    </select>
+
+
+    <delete id="deleteMailkeyByMail" parameterType="String">
+        DELETE FROM mailkey WHERE mailkey_mail = #{value}
+    </delete>
+</mapper>

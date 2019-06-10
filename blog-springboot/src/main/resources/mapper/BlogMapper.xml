@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzx.dao.BlogDao">
+
+    <resultMap id="Blog" type="Blog">
+        <id property="id" column="blog_id"/>
+        <result property="title" column="blog_title"/>
+        <result property="body" column="blog_body"/>
+        <result property="discussCount" column="blog_discussCount"/>
+        <result property="blogViews" column="blog_blogViews"/>
+        <result property="time" column="blog_time"/>
+        <result property="state" column="blog_state"/>
+        <result property="user.id" column="user_id"/>
+        <result property="user.name" column="user_name"/>
+    </resultMap>
+
+    <insert id="saveBlog" parameterType="Blog" useGeneratedKeys="true" keyProperty="id" keyColumn="blog_id">
+        INSERT INTO blog
+        VALUES (null,#{title},#{body},#{discussCount},#{blogViews},#{time},#{state},#{user.id})
+    </insert>
+
+    <insert id="saveBlogTag">
+        INSERT INTO blog_tag
+        VALUES (#{blogId},#{tagId})
+    </insert>
+
+    <select id="findBlogById" parameterType="Integer" resultMap="Blog">
+        SELECT blog_id,blog_title,blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        FROM blog b LEFT JOIN user u on b.user_id = u.user_id
+        WHERE blog_id = #{value} AND b.blog_state = 1
+    </select>
+
+    <select id="findBlogByUserId" resultMap="Blog">
+        SELECT blog_id,blog_title,blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        FROM blog b LEFT JOIN user u on b.user_id = u.user_id
+        WHERE u.user_id = #{id} AND b.blog_state = 1
+        ORDER BY blog_time DESC
+        LIMIT #{start},#{showCount}
+    </select>
+
+    <select id="getBlogCountByUserId" parameterType="Integer" resultType="Long">
+        SELECT count(1)
+        FROM blog
+        WHERE user_id = #{value} AND blog_state = 1
+    </select>
+
+    <select id="getHomeBlogCount" resultType="Long">
+        SELECT count(1)
+        FROM blog
+        WHERE blog_state = 1
+    </select>
+
+    <select id="findHomeBlog" resultMap="Blog">
+        SELECT blog_id,blog_title,blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        FROM blog b LEFT JOIN user u on b.user_id = u.user_id
+        WHERE b.blog_state = 1
+        ORDER BY blog_time DESC
+        LIMIT #{start},#{showCount}
+    </select>
+
+    <select id="findHotBlog" parameterType="Integer" resultMap="Blog">
+        SELECT blog_id,blog_title,blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state
+        FROM blog
+        WHERE blog_state = 1
+        ORDER BY blog_blogViews DESC,blog_discussCount DESC
+        LIMIT 0,#{value}
+    </select>
+
+    <select id="searchBlog" resultMap="Blog">
+        SELECT blog_id,blog_title,blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        FROM blog b LEFT JOIN user u on b.user_id = u.user_id
+        WHERE ( b.blog_title LIKE '%${searchText}%' OR b.blog_body LIKE '%${searchText}%') AND b.blog_state = 1
+        ORDER BY blog_time DESC
+        LIMIT #{start},#{showCount}
+    </select>
+
+    <select id="getSearchBlogCount" parameterType="String" resultType="Long">
+        SELECT COUNT(1)
+        FROM blog
+        WHERE ( blog_title LIKE '%${value}%' OR blog_body LIKE '%${value}%') AND blog_state = 1
+    </select>
+
+    <select id="findAllblog" resultMap="Blog">
+        SELECT blog_id,blog_title,blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        FROM blog b LEFT JOIN user u on b.user_id = u.user_id
+        ORDER BY blog_state DESC,blog_time DESC
+        LIMIT #{start},#{showCount}
+    </select>
+
+    <select id="getAllBlogCount" resultType="Long">
+        SELECT COUNT(1)
+        FROM blog
+    </select>
+
+
+    <update id="updateBlog" parameterType="Blog">
+        UPDATE blog
+        SET blog_title = #{title},
+            blog_body = #{body}
+        WHERE blog_id = #{id}
+    </update>
+
+
+    <update id="updateBlogState">
+        UPDATE blog
+        SET blog_state = #{blogState}
+        WHERE blog_id = #{blogId}
+    </update>
+
+    <select id="getSearchAllBlogCount" parameterType="String" resultType="Long">
+        SELECT COUNT(1)
+        FROM blog
+        WHERE blog_title LIKE '%${value}%'
+    </select>
+
+    <select id="searchAllBlog" resultMap="Blog">
+        SELECT blog_id,blog_title,blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        FROM blog b LEFT JOIN user u on b.user_id = u.user_id
+        WHERE blog_title LIKE '%${searchText}%'
+        ORDER BY blog_state DESC,blog_time DESC
+        LIMIT #{start},#{showCount}
+    </select>
+
+    <select id="statisticalBlogByMonth" parameterType="Integer" resultType="Map">
+        SELECT YEAR(blog_time) year, MONTH(blog_time) month,COUNT(1) count FROM blog
+        GROUP BY YEAR(blog_time),MONTH(blog_time)
+        ORDER by blog_time DESC
+        LIMIT 0,#{value}
+    </select>
+    
+    <update id="updateBlogDiscussCount" parameterType="Blog">
+        UPDATE blog
+        SET blog_discussCount = #{discussCount}
+        WHERE blog_id = #{id}
+    </update>
+
+    <update id="updateBlogViews" parameterType="Blog">
+        UPDATE blog
+        SET blog_blogViews = #{blogViews}
+        WHERE blog_id = #{id}
+    </update>
+
+    <select id="findBlogCountByTagId" parameterType="Integer" resultType="Integer">
+        SELECT COUNT(1) from blog_tag bt LEFT JOIN blog b on bt.blog_id = b.blog_id
+        WHERE tag_id = #{value} AND b.blog_state = 1
+    </select>
+
+</mapper>
