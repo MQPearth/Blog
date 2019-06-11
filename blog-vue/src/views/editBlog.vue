@@ -22,7 +22,8 @@
       <div>
         <p class="el-icon-mouse">选择一个以上标签</p>
         <el-checkbox-group v-model="checkboxGroup">
-          <el-checkbox v-for="tag in tags" :key="tag.id" :label="tag.id" border>
+          <el-checkbox v-for="tag in tags" :key="tag.id" :label="tag.id" border
+                       style="margin-top: 10px">
             {{tag.name}}
           </el-checkbox>
         </el-checkbox-group>

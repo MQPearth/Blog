@@ -61,6 +61,7 @@
       currentChange(currentPage) { //页码更改事件处理
         this.currentPage = currentPage;
         this.loadBlog();
+        scrollTo(0, 0);
       },
       loadBlog() { //加载数据
         blog.getMyBlog(this.currentPage, this.pageSize).then(responese => {

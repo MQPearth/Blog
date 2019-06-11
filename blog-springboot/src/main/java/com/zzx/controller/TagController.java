@@ -35,8 +35,12 @@ public class TagController {
     public Result newTag(String tagName) {
         if (!formatUtil.checkStringNull(tagName))
             return Result.create(StatusCode.ERROR, "参数异常");
-        tagService.saveTag(tagName);
-        return Result.create(StatusCode.OK, "新增成功");
+        try {
+            tagService.saveTag(tagName);
+            return Result.create(StatusCode.OK, "新增成功");
+        } catch (RuntimeException e) {
+            return Result.create(StatusCode.ERROR, "新增失败," + e.getMessage());
+        }
     }
 
     /**

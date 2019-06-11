@@ -8,20 +8,21 @@
       <div id="title">
         <h2 style="text-align: center">{{title}}</h2>
       </div>
-      <div>
+      <div style="text-align: center">
         <p>
-          <span class="el-icon-time" style="margin-left: 15%">&nbsp;{{getTime(time)}}</span>
+          <span class="el-icon-time">&nbsp;{{getTime(time)}}</span>
 
           <span class="el-icon-view" style="margin-left: 100px">&nbsp;{{blogViews}}</span>
 
           <span class="el-icon-chat-line-square" style="margin-left: 100px">&nbsp;{{discussCount}}</span>
-
-          <span style="margin-left: 100px">
-          <span v-for="tag in catchTagName(tags)">
-            <el-tag type="success" style="margin-left: 5px">{{tag}}</el-tag>
-          </span>
-        </span>
           <span class="el-icon-user-solid" style="margin-left: 150px">&nbsp;{{userName}}</span>
+        </p>
+        <p>
+          <span>
+            <span v-for="tag in catchTagName(tags)">
+              <el-tag type="success" style="margin-left: 5px">{{tag}}</el-tag>
+            </span>
+          </span>
         </p>
       </div>
 

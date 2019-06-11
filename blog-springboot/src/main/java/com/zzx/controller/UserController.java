@@ -75,7 +75,6 @@ public class UserController {
     }
 
 
-	/**特殊情况下使用 数据库role表中需有USER ADMIN 两个字段
     /**
      * 创建管理员
      *
@@ -103,7 +102,6 @@ public class UserController {
             }
         }
     }
-	*/
 
     /**
      * 用户注册

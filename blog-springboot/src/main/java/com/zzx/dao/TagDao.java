@@ -62,4 +62,10 @@ public interface TagDao {
      * @param tagId
      */
     void deleteTagByTagId(Integer tagId);
+
+    /**
+     * 根据标签名查询标签
+     * @return
+     */
+    Tag findTagByTagName(String tagName);
 }

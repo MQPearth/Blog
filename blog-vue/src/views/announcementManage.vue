@@ -107,6 +107,7 @@
       currentChange(currentPage) { //页码更改事件处理
         this.currentPage = currentPage;
         this.load();
+        scrollTo(0, 0);
       },
       sendAnnouncement() {
         if (this.announcementTitle.length <= 0 || this.announcementBody.length <= 0) {

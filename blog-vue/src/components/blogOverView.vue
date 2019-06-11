@@ -1,36 +1,43 @@
 <template>
   <el-card id="blogOverView">
+
+    <div style="position: absolute;right: 25%;width: 10%" @mouseenter="pEnter()" @mouseleave="pLeave()">
+      <span style="width: 5%" v-if="show&&(getStoreName()==name)" @click="editBlog(id)" title="编辑">
+          <el-link class="el-icon-edit-outline" :underline="false"></el-link>
+        </span>
+      <span style="width: 5%;margin-left: 1%;"
+            v-if="show&&(getStoreName()==name||getStoreRoles().indexOf('ADMIN')>-1)"
+            title="删除" @click="deleteBlog(id)">
+          <el-link class="el-icon-delete" :underline="false"></el-link>
+        </span>
+    </div>
+
     <div @mouseenter="pEnter()" @mouseleave="pLeave()">
-      <router-link v-bind:to="'/blog/'+id">
+      <el-link :underline="false" @click="router(id)">
         <h3 id="title">{{title}}</h3>
-      </router-link>
+      </el-link>
     </div>
     <div id="body" @mouseenter="pEnter()" @mouseleave="pLeave()">
       {{bodyTran(body)}}
     </div>
     <div @mouseenter="pEnter()" @mouseleave="pLeave()">
-      <p>
+      <p style="overflow: hidden;text-overflow:ellipsis; white-space: nowrap;">
         <span class="el-icon-time" style="width: 20%">&nbsp;{{time}}</span>
 
         <span class="el-icon-view" style="width: 15%">&nbsp;{{blogViews}}</span>
 
         <span class="el-icon-chat-line-square" style="width: 10%">&nbsp;{{discussCount}}</span>
 
-        <span style="width: 30%">
+        <span class="el-icon-user-solid" style="width: 10%;text-align: center;">
+          &nbsp;{{name}}
+        </span>
+
+        <span>
           <span v-for="tag in tags">
             <el-tag size="small" type="success" style="margin-left: 5px">{{tag}}</el-tag>
           </span>
         </span>
-        <span class="el-icon-user-solid" style="width: 10%;text-align: center;margin-left: 5%">&nbsp;{{name}}</span>
 
-        <span style="width: 5%" v-if="show&&(getStoreName()==name)" @click="editBlog(id)" title="编辑">
-          <el-link class="el-icon-edit-outline" :underline="false"></el-link>
-        </span>
-        <span style="width: 5%;margin-left: 1%"
-              v-if="show&&(getStoreName()==name||getStoreRoles().indexOf('ADMIN')>-1)"
-              title="删除" @click="deleteBlog(id)">
-          <el-link class="el-icon-delete" :underline="false"></el-link>
-        </span>
       </p>
     </div>
   </el-card>
@@ -48,6 +55,12 @@
       }
     },
     methods: {
+      router(id) {
+        scrollTo(0, 0);
+        this.$router.push({ //路由跳转
+          path: '/blog/' + id
+        });
+      },
       pEnter() {
         this.show = true;
       },
@@ -86,7 +99,8 @@
               window.location.reload()
             })
           }
-        }).catch(()=>{});
+        }).catch(() => {
+        });
 
       },
       bodyTran(body) { //将数据库中带标签的博文转换为纯文本

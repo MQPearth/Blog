@@ -20,11 +20,15 @@
       <div>
         <p class="el-icon-mouse">选择一个以上标签</p>
         <el-checkbox-group v-model="checkboxGroup">
-          <el-checkbox v-for="tag in tags" :key="tag.id" :label="tag.id" border>{{tag.name}}</el-checkbox>
+          <el-checkbox v-for="tag in tags" :key="tag.id" :label="tag.id" border
+            style="margin-top: 10px">
+            {{tag.name}}
+          </el-checkbox>
         </el-checkbox-group>
       </div>
 
-      <el-button style="margin-top: 3%;" type="primary" plain class="el-icon-document-checked" @click="sendBlog">发布
+      <el-button style="margin-top: 3%;" type="primary" plain class="el-icon-document-checked" @click="sendBlog">
+        发布
       </el-button>
     </el-card>
 
@@ -98,7 +102,6 @@
       },
       save() {
         if (this.title.length > 0 && this.body.length > 0) {
-
           file.generateTxt(this.title, this.body + '\n' + new Date().toLocaleString());
         }
       }

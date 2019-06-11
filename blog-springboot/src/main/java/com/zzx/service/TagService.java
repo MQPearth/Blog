@@ -39,6 +39,11 @@ public class TagService {
     public void saveTag(String tagName) {
         String username = jwtTokenUtil.getUsernameFromRequest(request);
         User user = userDao.findUserByName(username);
+
+
+        if (tagDao.findTagByTagName(tagName) != null) //mysql where tag_name 忽略大小写
+            throw new RuntimeException("标签重复");
+
         Tag tag = new Tag();
         tag.setUser(user);
         tag.setName(tagName);
