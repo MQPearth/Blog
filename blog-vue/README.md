@@ -10,4 +10,16 @@
 * mavon-editor  [开源md编辑器](https://github.com/hinesboy/mavonEditor)
 * qs
 
+#### Run
+
+安装依赖
+```
+npm install
+```
+
+```
+npm run dev
+```
+
+
 ...
