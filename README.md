@@ -33,6 +33,9 @@
 * 博客 ![博客](img/blog_demo.png)
 * 后台 ![后台](img/admin_demo.png)
 
+#### docker 部署教程
+[Docker 部署本站 详细全过程 附代码](http://134.175.116.44/#/blog/2)
+
 ##### Tips
 
 1. 水平所限，部分代码可能有坑
