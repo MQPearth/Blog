@@ -41,7 +41,6 @@
 1. 水平所限，部分代码可能有坑
 2. 管理员账号 admin 密码 1
 3. 后面可能会加上mq/elasticsearch
-4. 正在琢磨docker，准备把工程弄进docker
 
 ... 
 
