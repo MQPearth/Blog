@@ -11,21 +11,21 @@
           <el-menu-item index="3" style="margin-left: 2%" route="/announcement">本站公告</el-menu-item>
 
 
-          <el-menu-item id="space" index="" @click="egg"/>
+          <el-menu-item id="space" index="" @click="egg" class="hidden-xs-only"/>
           <!--<el-menu-item/>-->
 
 
-          <div style="width: 20%;float: left;margin: 10px 2% 0px -5%">
+          <div style="width: 20%;float: left;margin: 10px 2% 0px -5%" class="hidden-xs-only">
             <el-input placeholder="搜索博客" v-model="searchTxt" suffix-icon="el-icon-search"
                       @keyup.enter.native="searchSubmit"/>
           </div>
 
 
-          <el-menu-item v-if="this.$store.state.token==''" index="" @click="loginFormVisible = true">
+          <el-menu-item class="hidden-xs-only" v-if="this.$store.state.token==''" index="" @click="loginFormVisible = true">
             <el-button type="text">登录</el-button>
           </el-menu-item>
 
-          <el-menu-item v-if="this.$store.state.token==''" index="" @click="registerFormVisible = true">
+          <el-menu-item class="hidden-xs-only" v-if="this.$store.state.token==''" index="" @click="registerFormVisible = true">
             <el-button type="text">注册</el-button>
           </el-menu-item>
 
@@ -81,7 +81,7 @@
           </el-dialog>
 
 
-          <el-submenu index="" v-if="this.$store.state.token!==''" :router="true">
+          <el-submenu class="hidden-xs-only" index="" v-if="this.$store.state.token!==''" :router="true">
             <template slot="title">[&nbsp;&nbsp;{{this.$store.state.name}}&nbsp;&nbsp;]</template>
 
             <el-menu-item route="/newBlog" index="4-1">&nbsp;&nbsp;&nbsp;
@@ -117,6 +117,8 @@
 </template>
 <script>
   import user from '@/api/user'
+
+  import 'element-ui/lib/theme-chalk/display.css';
 
   export default {
     name: 'bar',

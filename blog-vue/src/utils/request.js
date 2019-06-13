@@ -70,7 +70,7 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('错误:' + error.response.status)// for debug
+    console.log('错误:' + error.message)// for debug
     var message;
     if (error.response.status == 504) {
       message = '连接超时'

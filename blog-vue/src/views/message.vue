@@ -29,21 +29,26 @@
       </el-pagination>
     </div>
 
-    <div style="width: 50%;margin-left: -100px;padding-top: 2%">
-      <el-input v-model="messageBody" placeholder="请输入留言内容" style="width: 40%" size="small"></el-input>
-      <el-button type="primary" style="width: 10%" size="small" @click="sendMessage">留言</el-button>
+    <div style="width: 60%;margin-left: -9%;padding-top: 2%" class="hidden-xs-only">
+      <el-row>
+        <el-input  v-model="messageBody" placeholder="请输入留言内容" style="width: 40%" size="small"/>
+        <el-button type="primary" style="width: 15%" size="small" @click="sendMessage">
+          留言
+        </el-button>
+      </el-row>
     </div>
   </el-card>
 </template>
 <script>
   import message from '@/api/message'
+  import 'element-ui/lib/theme-chalk/display.css';
 
   export default {
     name: 'message',
     data() {
       return {
         total: 0,        //数据总数
-        messageList: [],   //当前页数据 防止空页面的突兀
+        messageList: [],   //当前页数据
         pageSize: 5,    //每页显示数量
         currentPage: 1,   //当前页数
         messageBody: '',
@@ -52,6 +57,7 @@
     },
     created() {
       this.loadMessage();
+
     },
     methods: {
       loadMessage() {
@@ -66,6 +72,13 @@
         this.loadMessage();
       },
       sendMessage() {
+        if (this.messageBody.length <= 0) {
+          this.$message({
+            type: 'error',
+            message: '字段不完整'
+          });
+          return;
+        }
         message.sendMessage(this.messageBody).then(res => {
           this.$message({
             type: 'success',

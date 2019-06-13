@@ -10,12 +10,12 @@
       </div>
       <div style="text-align: center">
         <p>
-          <span class="el-icon-time">&nbsp;{{getTime(time)}}</span>
+          <span class="el-icon-time hidden-xs-only">&nbsp;{{getTime(time)}}</span>
 
-          <span class="el-icon-view" style="margin-left: 100px">&nbsp;{{blogViews}}</span>
+          <span class="el-icon-view hidden-xs-only" style="margin-left: 100px">&nbsp;{{blogViews}}</span>
 
-          <span class="el-icon-chat-line-square" style="margin-left: 100px">&nbsp;{{discussCount}}</span>
-          <span class="el-icon-user-solid" style="margin-left: 150px">&nbsp;{{userName}}</span>
+          <span class="el-icon-chat-line-square hidden-xs-only" style="margin-left: 100px">&nbsp;{{discussCount}}</span>
+          <span class="el-icon-user-solid hidden-xs-only" style="margin-left: 150px">&nbsp;{{userName}}</span>
         </p>
         <p>
           <span>
@@ -32,7 +32,7 @@
       <!--:toolbarsFlag="false"  :subfield="false" defaultOpen="preview"-->
 
       <el-divider></el-divider>
-      <div id="discuss">
+      <div id="discuss" class="hidden-xs-only">
 
         <div style="width: 50%;margin-left: 2.5%;padding-top: 2%" v-if="getStoreName()!=''">
           <el-input v-model="discussBody" placeholder="请输入评论内容" style="width: 40%" size="mini"></el-input>
@@ -102,6 +102,8 @@
   import reply from '@/api/reply'
   import date from '@/utils/date'
 
+  import 'element-ui/lib/theme-chalk/display.css';
+
   export default {
     name: 'blog',
     data() {
@@ -128,6 +130,11 @@
     watch: {
       blogId() {//在此调用接口
         this.loadBlog();
+        var w = document.documentElement.offsetWidth || document.body.offsetWidth;
+        if (w < 768) {  //对应xs
+          document.getElementById('editor').style.margin = '0% 0%'
+          document.getElementById('blog').style.margin = '20px 0% 0 0%'
+        }
       }
     },
     methods: {
@@ -282,7 +289,7 @@
   }
 
   #editor {
-    margin: 5% 5%;
+    margin: 2% 2%;
     height: 100%;
   }
 

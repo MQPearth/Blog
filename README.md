@@ -22,9 +22,7 @@
   * prototype.md		   原型文档
   * 踩坑整理.docx           写本项目遇到的坑
 * project                              已配置的项目压缩文件
-  * blog-springboot       项目压缩包
-  * blog-vue                    项目压缩包
-  * nginx                          nginx压缩包 已部署前端工程
+  * nginx.conf                 nginx配置文件，已配置好
 * blog.sql                             mysql数据库结构
 
 #### 预览

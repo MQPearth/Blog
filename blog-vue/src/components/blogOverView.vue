@@ -17,18 +17,18 @@
         <h3 id="title">{{title}}</h3>
       </el-link>
     </div>
-    <div id="body" @mouseenter="pEnter()" @mouseleave="pLeave()">
+    <div id="body" @mouseenter="pEnter()" @mouseleave="pLeave()" >
       {{bodyTran(body)}}
     </div>
     <div @mouseenter="pEnter()" @mouseleave="pLeave()">
       <p style="overflow: hidden;text-overflow:ellipsis; white-space: nowrap;">
-        <span class="el-icon-time" style="width: 20%">&nbsp;{{time}}</span>
+        <span class="el-icon-time hidden-xs-only" style="width: 20%" >&nbsp;{{time}}</span>
 
-        <span class="el-icon-view" style="width: 15%">&nbsp;{{blogViews}}</span>
+        <span class="el-icon-view hidden-xs-only" style="width: 15%">&nbsp;{{blogViews}}</span>
 
-        <span class="el-icon-chat-line-square" style="width: 10%">&nbsp;{{discussCount}}</span>
+        <span class="el-icon-chat-line-square hidden-xs-only" style="width: 10%">&nbsp;{{discussCount}}</span>
 
-        <span class="el-icon-user-solid" style="width: 10%;text-align: center;">
+        <span class="el-icon-user-solid hidden-xs-only" style="width: 10%;text-align: center;">
           &nbsp;{{name}}
         </span>
 
@@ -45,6 +45,7 @@
 <script>
 
   import blog from '@/api/blog'
+  import 'element-ui/lib/theme-chalk/display.css';
 
   export default {
     name: 'blogOverView',

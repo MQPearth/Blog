@@ -4,7 +4,9 @@
     <div v-if="loading" style="margin: 35% 0"></div>
     <div v-for="announcement in announcementList"
          style="text-align: left;padding-left: 2%;">
-      <div :class="(announcement.top==1)?'normal':'subscript'" v-if="announcement.top==0">置顶</div>
+      <div class="top" :class="(announcement.top==1)?'normal':'subscript'" v-if="announcement.top==0">
+        置顶
+      </div>
 
       <p style="color:#409EFF" class="el-icon-data-board">
         &nbsp;{{announcement.title}}
@@ -48,6 +50,15 @@
     created() {
       this.loadAnnouncement();
     },
+    updated: function () {
+      var w = document.documentElement.offsetWidth || document.body.offsetWidth;
+      if (w < 768) {  //对应xs
+        var tops = document.getElementsByClassName('subscript');
+        for (var i = 0; i < tops.length; i++) {
+          tops[i].style.marginLeft = '80%'
+        }
+      }
+    },
     methods: {
       loadAnnouncement() {
         announcement.getAnnouncement(this.currentPage, this.pageSize).then(res => {
@@ -76,7 +87,7 @@
     height: 30px;
     width: 80px;
     margin-top: -25px;
-    margin-left: 96%;
+    margin-left: 94%;
     text-align: center;
     line-height: 30px;
     background-color: #67C23A;

@@ -20,5 +20,5 @@ npm install
 ```
 npm run dev
 ```
-对了，并没有响应式
+
 ...
