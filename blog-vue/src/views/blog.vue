@@ -132,6 +132,7 @@
         this.loadBlog();
         var w = document.documentElement.offsetWidth || document.body.offsetWidth;
         if (w < 768) {  //对应xs
+	  document.getElementById('editor').style.margin = '0% -4.5%';
           document.getElementById('editor').style.margin = '0% 0%'
           document.getElementById('blog').style.margin = '20px 0% 0 0%'
         }
