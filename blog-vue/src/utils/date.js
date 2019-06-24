@@ -7,7 +7,7 @@ function timeago(timestamp) { //将时间转化成离现在几分钟，几小时
   if (diff >= 24) {  //时间差大于24个小时 显示标准时间 例：2019.6.5 00:26:11
     var year = date.getFullYear();
     var month = date.getMonth() + 1;
-    var day = date.getDay();
+    var day = date.getDate();
     var hours = date.getHours();
     if (hours < 10)
       hours = '0' + hours;
