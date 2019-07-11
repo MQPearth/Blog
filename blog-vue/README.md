@@ -16,6 +16,11 @@
 ```
 npm install
 ```
+npm 失败的话，试试cnpm 
+```
+npm install -g cnpm --registry=https://registry.npm.taobao.org
+cnpm install
+```
 运行
 ```
 npm run dev
