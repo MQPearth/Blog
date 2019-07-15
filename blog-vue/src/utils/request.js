@@ -37,12 +37,20 @@ service.interceptors.response.use(
     if (res.code !== 200) {
 
       if (res.code != 403) {
+        //开发环境
+        // Message({
+        //   message: res.code + ' : ' + res.message,
+        //   type: 'error',
+        //   duration: 5 * 1000
+        // })
+        //生产环境
         Message({
-          message: res.code + ' : ' + res.message,
+          message: res.message,
           type: 'error',
           duration: 5 * 1000
         })
       }
+      
       // 403:Token过期 或 权限不足(恶意访问/被封禁) ;
       if (res.code === 403) {
         store.commit('logout');
