@@ -1,7 +1,7 @@
 package com.zzx.model.entity;
 
 /**
- * 状态码实体类
+ * 状态码
  */
 public class StatusCode {
     public static final int OK = 200;//成功

@@ -37,20 +37,19 @@ public class LoginService {
 
     /**
      * 保存登录信息
+     *
      * @param user
      */
     @Transactional
     public void saveLoginInfo(User user) {
 
         user = userDao.findUserByName(user.getName());
-        //删除原纪录
-        loginDao.deleteLoginByUserId(user.getId());
-        //新增一条
         Login login = new Login();
-        login.setUser(user);
-        login.setIp(requestUtil.getIpAddress(request));
-        login.setTime(dateUtil.getCurrentDate());
-        loginDao.saveLogin(login);
+        login.setUser(user);//绑定用户
+        login.setIp(requestUtil.getIpAddress(request));//获取操作ip
+        login.setTime(dateUtil.getCurrentDate());//操作时间
+        loginDao.updateLogin(login);
+      
     }
 
 }

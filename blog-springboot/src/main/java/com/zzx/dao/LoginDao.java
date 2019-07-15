@@ -21,4 +21,11 @@ public interface LoginDao {
      * 保存登录信息
      */
     void saveLogin(Login login);
+
+
+    /**
+     * 根据用户id修改登录操作表
+     * @param login
+     */
+    void updateLogin(Login login);
 }

@@ -19,4 +19,11 @@
         INSERT INTO login values(#{time},#{ip},#{user.id})
     </insert>
 
+    <update id="updateLogin" parameterType="Login">
+        update login
+        set login_ip = #{ip},
+        login_time = #{time}
+        where user_id = #{user.id}
+    </update>
+
 </mapper>

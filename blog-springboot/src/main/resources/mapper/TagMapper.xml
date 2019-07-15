@@ -55,4 +55,11 @@
         WHERE tag_id = #{value}
     </delete>
 
+    <!-- 忽略大小写 -->
+    <select id="findTagByTagName" parameterType="String" resultMap="Tag">
+        SELECT tag_id,tag_name,user_id
+        FROM tag
+        WHERE LOWER(tag_name) = LOWER(#{value})
+    </select>
+
 </mapper>

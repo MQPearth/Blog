@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://192.168.125.100:3306/blog?useUnicode=true&characterEncoding=utf8&useSSL=false
+    url: jdbc:mysql://192.168.125.101:3306/blog?useUnicode=true&characterEncoding=utf8&useSSL=false
     username: root
     password: admin
     driverClassName: com.mysql.jdbc.Driver
@@ -20,9 +20,9 @@ spring:
   ###邮箱配置
   mail:
     host: smtp.qq.com
-    username: #########qq.com
-    #QQ邮箱的授权码(去qq邮箱申请)
-    password: #########
+    username: 1970432392@qq.com
+    #QQ邮箱的授权码
+    password: fwvgmqvaemoiedib
     default-encoding: UTF-8
     properties:
       mail:
@@ -51,10 +51,10 @@ logging:
 
 ### jwt
 jwt:
-  ###过期时间 s数432000
+  ###过期时间 s数432000 5天
   time: 432000
   ###安全密钥
-  secret: "BlogSecret"
+  secret: "BlogKUDXSecret"
   ###token前缀
   prefix: "Bearer "
   ###http头key
