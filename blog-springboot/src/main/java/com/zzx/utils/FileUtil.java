@@ -24,16 +24,15 @@ public class FileUtil {
      */
     public String getSavePath() {
 
-        LinkedList<File> availablePath = ImgUploadConfig.getAvailablePath();
+        ConcurrentLinkedQueue<File> availablePath = ImgUploadConfig.getAvailablePath();
         Iterator<File> iterator = availablePath.iterator();
-        while (iterator.hasNext()) {
-            File file = iterator.next();
+       
+        while (iterator.hasNext()) { 
+			File file = iterator.next();
             if (file.listFiles().length < imgUploadConfig.getFolderSize())
                 return file.getPath();
             else {
-                File temp = file;
-                file = iterator.next();
-                availablePath.remove(temp);
+                availablePath.remove(file);
             }
         }
         return null;
