@@ -49,7 +49,7 @@ public class LoginService {
         login.setIp(requestUtil.getIpAddress(request));//获取操作ip
         login.setTime(dateUtil.getCurrentDate());//操作时间
         loginDao.updateLogin(login);
-      
+
     }
 
 }

@@ -330,11 +330,11 @@ public class UserController {
 //        return Result.create(StatusCode.OK, "管理员 或 用户");
 //    }
 //
-//    @PreAuthorize("hasAuthority('ADMIN') AND hasAnyAuthority('USER')")
-//    @GetMapping("/adminanduser")
-//    public String adminanduser() {
-//        return "管理员 且 用户";
-//    }
+    @PreAuthorize("hasAuthority('ADMIN') AND hasAnyAuthority('USER')")
+    @GetMapping("/adminanduser")
+    public String adminanduser() {
+        return "管理员 且 用户";
+    }
 //
 //    @ApiOperation(value = "管理员权限测试", notes = "测试")
 //    @PreAuthorize("hasAuthority('ADMIN')")

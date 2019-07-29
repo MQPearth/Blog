@@ -53,7 +53,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
             files = new ArrayList<>(fileUtil.initUploadFolder());
         }
         // 将生成的文件夹进行资源映射
-        ConcurrentLinkedQueue<File> availablePath = ImgUploadConfig.getAvailablePath();
+        LinkedList<File> availablePath = ImgUploadConfig.getAvailablePath();
         String[] paths = new String[files.size()];
         for (int i = 0; i < paths.length; i++) {
             File file = files.get(i);

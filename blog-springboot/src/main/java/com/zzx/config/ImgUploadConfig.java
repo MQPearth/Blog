@@ -23,9 +23,9 @@ public class ImgUploadConfig {
     //文件夹内单位数
     private Integer folderSize;
 
-    private static ConcurrentLinkedQueue<File> availablePath = new ConcurrentLinkedQueue<>();
+    private static LinkedList<File> availablePath = new LinkedList<>();
 
-    public synchronized static ConcurrentLinkedQueue<File> getAvailablePath() {
+    public static LinkedList<File> getAvailablePath() {
         return availablePath;
     }
 

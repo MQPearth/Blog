@@ -19,11 +19,12 @@ public class FileUtil {
     /**
      * 获取可用的文件保存路径
      * 当所有路径文件夹单位数都超过FolderSize时，返回null
+     *
      * @return
      */
-    public synchronized String getSavePath() {
+    public String getSavePath() {
 
-        ConcurrentLinkedQueue<File> availablePath = ImgUploadConfig.getAvailablePath();
+        LinkedList<File> availablePath = ImgUploadConfig.getAvailablePath();
         Iterator<File> iterator = availablePath.iterator();
         File file = iterator.next();
         while (iterator.hasNext()) {
@@ -51,7 +52,7 @@ public class FileUtil {
         files.add(root);
 
         for (int i = 0; i < imgUploadConfig.getLayerCount(); i++) {
-            LinkedList<File> filesClone = (LinkedList<File>) files.clone();
+            LinkedList<File> filesClone = (LinkedList<File>)files.clone();
             for (File file : filesClone) {
                 files.addAll(createFolder(file.getPath(), imgUploadConfig.getFolderSize()));//addAll 添加到链表末尾
             }
@@ -87,7 +88,7 @@ public class FileUtil {
         File root = new File(imgUploadConfig.getUploadFolder());
         files.add(root);
         for (int i = 0; i < imgUploadConfig.getLayerCount(); i++) {
-            LinkedList<File> filesClone = (LinkedList<File>) files.clone();
+            LinkedList<File> filesClone = (LinkedList<File>)files.clone();
             for (File file : filesClone) {
                 files.removeFirst();
                 Collections.addAll(files, file.listFiles());
