@@ -67,7 +67,7 @@ public class BlogService {
      * @return
      * @throws IOException
      */
-    public String saveImg(MultipartFile file) throws IOException {
+    public synchronized String saveImg(MultipartFile file) throws IOException {
 
         //获取图片格式/后缀
         String format = formatUtil.getFileFormat(file.getOriginalFilename());
