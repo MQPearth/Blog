@@ -26,8 +26,8 @@ public class FileUtil {
 
         LinkedList<File> availablePath = ImgUploadConfig.getAvailablePath();
         Iterator<File> iterator = availablePath.iterator();
-        File file = iterator.next();
         while (iterator.hasNext()) {
+            File file = iterator.next();
             if (file.listFiles().length < imgUploadConfig.getFolderSize())
                 return file.getPath();
             else {
