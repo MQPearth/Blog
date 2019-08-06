@@ -21,7 +21,7 @@ spring:
   mail:
     host: smtp.qq.com
     username: 1970432392@qq.com
-    #QQ邮箱的授权码
+    #QQ邮箱的授权码 这个是假的
     password: fwvgmqvaemoiedib
     default-encoding: UTF-8
     properties:
