@@ -22,6 +22,10 @@ import java.io.IOException;
 @RequestMapping("/blog")
 public class BlogController {
 
+    private static final String IMAGE_JPG = ".jpg";
+
+    private static final String IMAGE_PNG = ".png";
+
     @Autowired
     private BlogService blogService;
 
@@ -32,11 +36,18 @@ public class BlogController {
     @PreAuthorize("hasAuthority('USER')")
     @PostMapping("/uploadImg")
     public Result uploadImg(MultipartFile file) {
-        if (!formatUtil.checkObjectNull(file))
+        if (!formatUtil.checkObjectNull(file)) {
             return Result.create(StatusCode.ERROR, "参数错误");
-        if (formatUtil.getFileFormat(file.getOriginalFilename()) == null)
-            return Result.create(StatusCode.ERROR, "图片缺少格式");
+        }
+        String fileFormat = formatUtil.getFileFormat(file.getOriginalFilename());
 
+        if (null == fileFormat) {
+            return Result.create(StatusCode.ERROR, "图片缺少格式");
+        }
+
+        if (!IMAGE_JPG.equals(fileFormat.toLowerCase()) && !IMAGE_PNG.equals(fileFormat.toLowerCase())) {
+            return Result.create(StatusCode.ERROR, "图片格式错误");
+        }
         try {
             String url = blogService.saveImg(file);
             return Result.create(StatusCode.OK, "上传成功", url);
@@ -45,20 +56,21 @@ public class BlogController {
         }
     }
 
+
     /**
      * 保存博文，博文内容由前端md编辑器生成
      *
      * @param blogBody
      * @param blogTitle
-     *
      * @return
      */
     @ApiOperation(value = "发布博文", notes = "博文标题+博文内容+博文标签")
     @PreAuthorize("hasAuthority('USER')")
     @PostMapping
     public Result newBlog(String blogTitle, String blogBody, Integer[] tagId) {
-        if (!formatUtil.checkStringNull(blogTitle, blogBody) || !formatUtil.checkPositive(tagId))
+        if (!formatUtil.checkStringNull(blogTitle, blogBody) || !formatUtil.checkPositive(tagId)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
 
         blogService.saveBlog(blogTitle, blogBody, tagId);
         return Result.create(StatusCode.OK, "发布成功");
@@ -66,13 +78,13 @@ public class BlogController {
 
 
     @ApiOperation(value = "根据id查询博文", notes = "博文id")
-    @GetMapping("/{blogId}")
-    public Result findBlogById(@PathVariable Integer blogId) {
-        if (!formatUtil.checkObjectNull(blogId))
+    @GetMapping("/{blogId}/{isHistory}")
+    public Result findBlogById(@PathVariable Integer blogId, @PathVariable boolean isHistory) {
+        if (!formatUtil.checkObjectNull(blogId)) {
             return Result.create(StatusCode.ERROR, "参数错误");
-
+        }
         try {
-            return Result.create(StatusCode.OK, "查询成功", blogService.findBlogById(blogId));
+            return Result.create(StatusCode.OK, "查询成功", blogService.findBlogById(blogId, isHistory));
         } catch (RuntimeException e) {
             return Result.create(StatusCode.NOTFOUND, "此博客不存在");
         }
@@ -91,8 +103,9 @@ public class BlogController {
     @GetMapping("/myblog/{page}/{showCount}")
     public Result findBlogByUser(@PathVariable Integer page, @PathVariable Integer showCount) {
 
-        if (!formatUtil.checkPositive(page, showCount))
+        if (!formatUtil.checkPositive(page, showCount)) {
             return Result.create(StatusCode.OK, "参数错误");
+        }
 
         PageResult<Blog> pageResult =
                 new PageResult<>(blogService.getBlogCountByUser(), blogService.findBlogByUser(page, showCount));
@@ -103,16 +116,18 @@ public class BlogController {
 
     /**
      * 首页分页查询
+     * 查询的范围在 最近10条博客 内
      *
-     * @param page
-     * @param showCount
+     * @param page      页码
+     * @param showCount 显示条数
      * @return
      */
     @ApiOperation(value = "首页分页查询博文", notes = "页数+显示数量")
     @GetMapping("/home/{page}/{showCount}")
     public Result homeBlog(@PathVariable Integer page, @PathVariable Integer showCount) {
-        if (!formatUtil.checkPositive(page, showCount))
+        if (!formatUtil.checkPositive(page, showCount) || showCount > BlogService.REDIS_NEW_BLOG_COUNT) {
             return Result.create(StatusCode.OK, "参数错误");
+        }
 
 
         PageResult<Blog> pageResult =
@@ -148,10 +163,12 @@ public class BlogController {
     public Result searchBlog(String search,
                              @PathVariable Integer page,
                              @PathVariable Integer showCount) {
-        if (!formatUtil.checkPositive(page, showCount))
+        if (!formatUtil.checkPositive(page, showCount)) {
             return Result.create(StatusCode.OK, "参数错误");
-        if (!formatUtil.checkStringNull(search))
+        }
+        if (!formatUtil.checkStringNull(search)) {
             return Result.create(StatusCode.OK, "参数错误");
+        }
 
         PageResult<Blog> pageResult = new PageResult<>(blogService.getSearchBlogCount(search),
                 blogService.searchBlog(search, page, showCount));
@@ -168,8 +185,9 @@ public class BlogController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/AllBlog/{page}/{showCount}")
     public Result findAllBlog(@PathVariable Integer page, @PathVariable Integer showCount) {
-        if (!formatUtil.checkPositive(page, showCount))
+        if (!formatUtil.checkPositive(page, showCount)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
         PageResult<Blog> pageResult = new PageResult<>(blogService.getAllBlogCount(), blogService.findAllBlog(page, showCount));
 
         return Result.create(StatusCode.OK, "查询成功", pageResult);
@@ -180,11 +198,13 @@ public class BlogController {
     @PutMapping("/{blogId}")
     public Result updateBlog(@PathVariable Integer blogId, String blogTitle, String blogBody, Integer[] tagId) {
 
-        if (!formatUtil.checkStringNull(blogTitle, blogBody))
+        if (!formatUtil.checkStringNull(blogTitle, blogBody)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
 
-        if (!formatUtil.checkPositive(tagId) || !formatUtil.checkPositive(blogId))
+        if (!formatUtil.checkPositive(tagId) || !formatUtil.checkPositive(blogId)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
 
         try {
             blogService.updateBlog(blogId, blogTitle, blogBody, tagId);
@@ -199,8 +219,9 @@ public class BlogController {
     @PreAuthorize("hasAuthority('USER')")
     @DeleteMapping("/{blogId}")
     public Result deleteBlog(@PathVariable Integer blogId) {
-        if (!formatUtil.checkPositive(blogId))
+        if (!formatUtil.checkPositive(blogId)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
 
         try {
             blogService.deleteBlog(blogId);
@@ -214,8 +235,9 @@ public class BlogController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/admin/{blogId}")
     public Result adminDeleteBlog(@PathVariable Integer blogId) {
-        if (!formatUtil.checkPositive(blogId))
+        if (!formatUtil.checkPositive(blogId)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
         blogService.adminDeleteBlog(blogId);
         return Result.create(StatusCode.OK, "删除成功");
     }
@@ -242,10 +264,12 @@ public class BlogController {
                                 @PathVariable Integer page,
                                 @PathVariable Integer showCount) {
 
-        if (!formatUtil.checkPositive(page, showCount))
+        if (!formatUtil.checkPositive(page, showCount)) {
             return Result.create(StatusCode.OK, "参数错误");
-        if (!formatUtil.checkStringNull(search))
+        }
+        if (!formatUtil.checkStringNull(search)) {
             return Result.create(StatusCode.OK, "参数错误");
+        }
 
         PageResult<Blog> pageResult = new PageResult<>(blogService.getSearchAllBlogCount(search),
                 blogService.searchAllBlog(search, page, showCount));

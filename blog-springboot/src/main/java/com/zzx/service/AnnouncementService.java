@@ -2,6 +2,7 @@ package com.zzx.service;
 
 import com.zzx.dao.AnnouncementDao;
 import com.zzx.model.pojo.Announcement;
+import com.zzx.utils.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +13,15 @@ public class AnnouncementService {
     @Autowired
     private AnnouncementDao announcementDao;
 
+    @Autowired
+    private DateUtil dateUtil;
+
     public void saveAnnouncement(String announcementTitle, String announcementBody) {
         announcementBody = announcementBody.replaceAll("\n", "<br />");
         Announcement announcement = new Announcement();
         announcement.setTitle(announcementTitle);
         announcement.setBody(announcementBody);
+        announcement.setTime(dateUtil.getCurrentDate());
         announcement.setTop(1);
         announcementDao.saveAnnouncement(announcement);
     }

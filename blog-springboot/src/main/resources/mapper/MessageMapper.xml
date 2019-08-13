@@ -9,17 +9,19 @@
         <id property="id" column="message_id"/>
         <result property="name" column="message_name"/>
         <result property="body" column="message_body"/>
+        <result property="time" column="message_time"/>
+
     </resultMap>
 
     <select id="findMessageByName" parameterType="String" resultMap="Message">
-        SELECT message_id,message_name,message_body
+        SELECT message_id,message_name,message_body,message_time
         FROM message
         WHERE message_name = #{value}
     </select>
 
     <insert id="saveMessage" parameterType="Message">
         INSERT INTO message
-        VALUES (null,#{name},#{body})
+        VALUES (null,#{name},#{body},#{time})
     </insert>
 
     <delete id="deleteMessageById" parameterType="Integer">
@@ -33,7 +35,7 @@
     </select>
 
     <select id="findMessage" resultMap="Message">
-        SELECT message_id,message_name,message_body
+        SELECT message_id,message_name,message_body,message_time
         FROM message
         ORDER BY message_id DESC
         LIMIT #{start},#{showCount}

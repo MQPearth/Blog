@@ -31,7 +31,16 @@
       <!-- 以下是预览模式配置 -->
       <!--:toolbarsFlag="false"  :subfield="false" defaultOpen="preview"-->
 
-      <el-divider></el-divider>
+      <div style="margin: 0 auto;width: 20%" class="hidden-xs-only" v-if="userReward!==null">
+        <br/>
+        <el-popover placement="bottom" width="250px" height="250px" trigger="hover">
+          <img alt="打赏码" :src="userReward" width="250px" height="250px"/>
+          <el-button type="text" slot="reference" icon="el-icon-trophy" round>写的不错，打赏一个</el-button>
+        </el-popover>
+      </div>
+
+
+      <el-divider/>
       <div id="discuss" class="hidden-xs-only">
 
         <div style="width: 50%;margin-left: 2.5%;padding-top: 2%" v-if="getStoreName()!=''">
@@ -39,8 +48,8 @@
           <el-button type="primary" style="width: 10%" size="mini" @click="sendDiscuss">评论</el-button>
         </div>
 
+        <!-- 评论部分 -->
         <div v-for="discuss in discussList" id="discussList">
-          <!-- 评论部分 -->
           <p style="margin: -5px " @mouseenter="pEnter()" @mouseleave="pLeave()">
             <el-button type="text">{{discuss.user.name}}&nbsp;&nbsp;:</el-button>
             <span style="margin-left: 10px">{{discuss.body}}</span>
@@ -116,6 +125,7 @@
         time: 0, //发布事件
         userName: '',//博客用户名
         tags: [],  //博文标签
+        userReward: '',//博主打赏码
 
         total: 0,        //数据总数
         discussList: [],   //当前页数据
@@ -132,9 +142,9 @@
         this.loadBlog();
         var w = document.documentElement.offsetWidth || document.body.offsetWidth;
         if (w < 768) {  //对应xs
-	  document.getElementById('editor').style.margin = '0% -4.5%';
-          document.getElementById('editor').style.margin = '0% 0%'
-          document.getElementById('blog').style.margin = '20px 0% 0 0%'
+          document.getElementById('editor').style.margin = '0% -4.5%';
+          document.getElementById('blog').style.margin = '20px 0% 0 0%';
+          document.getElementById('blog').style.padding = '0';
         }
       }
     },
@@ -154,33 +164,71 @@
         this.loadBlog();
       },
       loadBlog() { //加载数据
-        blog.getBlogById(this.blogId).then(res => {
-          this.title = res.data.title;
-          this.body = res.data.body;
-          this.discussCount = res.data.discussCount;
-          this.blogViews = res.data.blogViews;
-          this.time = res.data.time;
-          this.userName = res.data.user.name;
-          this.tags = res.data.tags;
-        })
+        var cookies = this.$cookies.get('history');
+        var isClick = null;
+        //存在此cookies key
+        if (this.$cookies.isKey('history')) {
+          //此cookies key 对应的 value 中有此 博客id
+          if (cookies.indexOf(this.blogId) > -1) {
+            //已点击查看
+            isClick = true;
+          } else {
+            isClick = false;
+          }
+        } else {
+          isClick = false;
+        }
+
+        blog.getBlogById(this.blogId, isClick).then(res => {
+            this.title = res.data.title;
+            this.body = res.data.body;
+            this.discussCount = res.data.discussCount;
+            this.blogViews = res.data.blogViews;
+            this.time = res.data.time;
+            this.userName = res.data.user.name;
+            this.tags = res.data.tags;
+            this.userReward = res.data.user.reward;
+
+            //设置cookies
+            // 是否存在history此key
+            if (this.$cookies.isKey('history')) {
+              var cookies = this.$cookies.get('history');
+
+              //不包含此博客的id  追加id
+              if (cookies.indexOf(this.blogId) <= -1) {
+                cookies = cookies + ',' + res.data.id;
+                this.$cookies.set('history', cookies);
+              }
+
+            } else {
+              var cookies = res.data.id;
+              this.$cookies.set('history', cookies);
+            }
+          }
+        );
 
         discuss.getDiscussByBlogId(this.blogId, this.currentPage, this.pageSize).then(responese => {
           this.total = responese.data.total;
           this.discussList = responese.data.rows;
         });
+
       },
       getStoreName() { //获取store中存储的name
         return this.$store.state.name;
-      },
+      }
+      ,
       getStoreRoles() { //获取store中存储的roles
         return this.$store.state.roles;
-      },
+      }
+      ,
       pEnter() {
         this.replyFlag = true
-      },
+      }
+      ,
       pLeave() {
         this.replyFlag = false
-      },
+      }
+      ,
       sendReply(discussId, replyId) {  //发送回复
         this.$prompt('请输入回复内容', '提示', {
           confirmButtonText: '回复',
@@ -202,7 +250,8 @@
           })
         }).catch(() => {
         });
-      },
+      }
+      ,
       sendDiscuss() {  //发送评论
         if (this.discussBody.length <= 0) {
           this.$message({
@@ -220,7 +269,8 @@
           this.discussBody = ''
           this.loadBlog();
         })
-      },
+      }
+      ,
       deleteDiscuss(discussId) {  //删除评论  判断是用户还是管理员 走不一样的api
         this.$confirm('是否删除此评论?', '提示', {
           confirmButtonText: '确定',
@@ -248,7 +298,8 @@
           this.loadBlog();
         }).catch(() => {
         });
-      },
+      }
+      ,
       deleteReply(replyId) {  //删除回复  判断是用户还是管理员 走不一样的api
         this.$confirm('是否删除此回复?', '提示', {
           confirmButtonText: '确定',
@@ -275,7 +326,8 @@
           this.loadBlog();
         }).catch(() => {
         });
-      },
+      }
+      ,
       back() {
         history.back()
       }

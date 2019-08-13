@@ -5,7 +5,7 @@
         <div slot="content">如果不慎封禁了管理员<br/>请去数据库修改管理员状态</div>
         <el-link :underline="false" style="margin-right: 68%;color: #E6A23C"><i class="el-icon-question"></i></el-link>
       </el-tooltip>
-        <el-button style="width: 7%;text-align: center" v-if="searchFlag == true" @click="returnNormal()">返回</el-button>
+      <el-button style="width: 7%;text-align: center" v-if="searchFlag == true" @click="returnNormal()">返回</el-button>
 
       <el-input placeholder="使用用户名模糊查询用户" v-model="searchName" suffix-icon="el-icon-search"
                 style="width: 30%;" @keyup.enter.native="searchSubmit"/>
@@ -19,28 +19,47 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="邮箱" width="280">
+        <el-table-column label="邮箱" width="240">
           <template slot-scope="scope">
             <i class="el-icon-message"></i>
             <span style="margin-left: 10px">{{ scope.row.mail }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="最后操作时间" width="180">
+        <el-table-column label="赞赏码" width="150">
+          <template slot-scope="scope">
+            <i class="el-icon-trophy" v-if="scope.row.reward!=null">&nbsp;&nbsp;&nbsp;&nbsp;</i>
+            <a href="javascript:">
+              <img v-if="scope.row.reward!=null" width="30px" height="30px" @click="showImg(scope.row.reward)"
+                   :src="scope.row.reward" alt="赞赏码"/>
+            </a>
+            <p class="el-icon-trophy" v-if="scope.row.reward==null">&nbsp;&nbsp;&nbsp;&nbsp;暂无记录</p>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="最后登录时间" width="180">
           <template slot-scope="scope">
             <i class="el-icon-time"></i>
-            <span style="margin-left: 10px">{{ getTime(scope.row.login.time) }}</span>
+            <span style="margin-left: 10px" v-if="scope.row.login!==null">{{ getTime(scope.row.login.time) }}</span>
+            <span style="margin-left: 10px" v-if="scope.row.login===null">暂无记录</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="最后操作IP" width="180">
+        <el-table-column label="最后登录IP" width="180">
           <template slot-scope="scope">
             <i class="el-icon-place"></i>
-            <span style="margin-left: 10px">{{ scope.row.login.ip }}</span>
+            <el-link :underline="false">
+              <span style="margin-left: 10px" v-if="scope.row.login!==null"
+                    @click="showIPInfo(scope.row.login===null?'':scope.row.login.ip)">{{ scope.row.login.ip }}</span>
+            </el-link>
+
+            <span style="margin-left: 10px" v-if="scope.row.login===null"
+                  @click="showIPInfo(scope.row.login===null?'':scope.row.login.ip)">暂无记录</span>
+
           </template>
         </el-table-column>
 
-        <el-table-column label="状态" width="180">
+        <el-table-column label="状态" width="130">
           <template slot-scope="scope">
             <i class="el-icon-wind-power"></i>
             <span style="margin-left: 10px" v-if="scope.row.state == 1">正常</span>
@@ -81,6 +100,7 @@
 </template>
 <script>
   import user from '@/api/user'
+  import other from '@/api/other'
   import date from '@/utils/date'
 
   export default {
@@ -107,8 +127,7 @@
             this.total = res.data.total;
             this.loading = false;
           })
-        }
-        else {
+        } else {
           user.getUser(this.currentPage, this.pageSize).then(res => {
             this.userData = res.data.rows;
             this.total = res.data.total;
@@ -151,6 +170,24 @@
             });
           }
           this.load();
+        });
+      },
+      showIPInfo(ip) {
+        if (ip === '')
+          return;
+        this.loading = true
+        other.getIPInfo(ip).then(res => {
+          this.loading = false
+          this.$alert('<div>' + res.text.ip2region_location + '</div>', '用户IP来源', {
+            dangerouslyUseHTMLString: true
+          });
+        }).catch(res => {
+          this.loading = false
+        })
+      },
+      showImg(imgPath) {
+        this.$alert('<div><img src=\'' + imgPath + '\' alt=\'赞赏码\' width=\'200px\' height=\'200px\'/> </div>', '用户赞赏码', {
+          dangerouslyUseHTMLString: true
         });
       }
     }

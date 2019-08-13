@@ -9,6 +9,8 @@ import com.zzx.model.pojo.Blog;
 import com.zzx.model.pojo.User;
 import com.zzx.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,9 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class BlogService {
@@ -61,6 +61,22 @@ public class BlogService {
 
 
     /**
+     * redis中存放 最新博客 数量 的最大值
+     */
+    public static final int REDIS_NEW_BLOG_COUNT = 10;
+
+    /**
+     * redis中存放 热门博客 数量 的最大值
+     */
+    public static final int REDIS_HOT_BLOG_COUNT = 6;
+
+
+    /**
+     * redis中存放 最新博客 的 key
+     */
+    private static final String REDIS_NEW_BLOG = "NEWBLOG";
+
+    /**
      * 保存图片,返回url
      *
      * @param file
@@ -73,8 +89,10 @@ public class BlogService {
         String format = formatUtil.getFileFormat(file.getOriginalFilename());
         //获取图片保存路径
         String savePath = fileUtil.getSavePath();
-        if (!formatUtil.checkStringNull(savePath))//存储已满
+        //存储已满
+        if (!formatUtil.checkStringNull(savePath)) {
             throw new IOException("存储已满 请联系管理员");
+        }
         //保存图片
         String fileName = uuidUtil.generateUUID() + format;
         File diskFile = new File(savePath + "/" + fileName);
@@ -90,7 +108,7 @@ public class BlogService {
      * @param blogBody
      * @param tagIds
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void saveBlog(String blogTitle, String blogBody, Integer[] tagIds) {
         User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
         Blog blog = new Blog();
@@ -115,13 +133,21 @@ public class BlogService {
      * @param blogId
      * @return
      */
-    public Blog findBlogById(Integer blogId) {
+    public Blog findBlogById(Integer blogId, boolean isHistory) {
         Blog blog = blogDao.findBlogById(blogId);
-        if (blog == null)
+        if (blog == null) {
             throw new RuntimeException("博客不存在");
+        }
         blog.setTags(tagDao.findTagByBlogId(blogId));
+
+        //历史查看过
+        if (isHistory) {
+            return blog;
+        }
+
         blog.setBlogViews(blog.getBlogViews() + 1);
         blogDao.updateBlogViews(blog);
+
         return blog;
     }
 
@@ -176,6 +202,7 @@ public class BlogService {
      * @return
      */
     public List<Blog> findHomeBlog(Integer page, Integer showCount) {
+
         List<Blog> blogs = blogDao.findHomeBlog((page - 1) * showCount, showCount);
 
         for (Blog blog : blogs) {
@@ -191,6 +218,7 @@ public class BlogService {
      * @return
      */
     public List<Blog> findHotBlog() {
+
         return blogDao.findHotBlog(6);
     }
 
@@ -238,12 +266,13 @@ public class BlogService {
      * @param blogBody
      * @param tagIds
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateBlog(Integer blogId, String blogTitle, String blogBody, Integer[] tagIds) {
         User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
         Blog blog = blogDao.findBlogById(blogId);
-        if (user.getId() != blog.getUser().getId())
+        if (!user.getId().equals(blog.getUser().getId())) {
             throw new RuntimeException("无权限修改");
+        }
 
         blog.setTitle(blogTitle);
         blog.setBody(blogBody);
@@ -261,15 +290,17 @@ public class BlogService {
      *
      * @param blogId
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteBlog(Integer blogId) {
         User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
         Blog blog = blogDao.findBlogById(blogId);
-//        user.setRoles(roleDao.findUserRoles(user.getId()));
-        if (user.getId() != blog.getUser().getId())
-            throw new RuntimeException("无权限删除");
 
-        blogDao.updateBlogState(blogId, 0);//更改博客状态
+        if (!user.getId().equals(blog.getUser().getId())) {
+            throw new RuntimeException("无权限删除");
+        }
+
+        //更改博客状态
+        blogDao.updateBlogState(blogId, 0);
 
         //级联删除blog_tag
         tagDao.deleteTagByBlogId(blogId);
@@ -280,7 +311,7 @@ public class BlogService {
      *
      * @param blogId
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void adminDeleteBlog(Integer blogId) {
 
         blogDao.updateBlogState(blogId, 0);//更改博客状态

@@ -11,17 +11,19 @@
 * Mybatis
 * Spring security
 * JWT
+* Redis
+* RabbitMQ
 * Swagger-UI
 
 #### 项目目录
 
 * blog-springboot              后端工程 [后端文档](blog-springboot/README.md)
-* blog-vue                           前端工程[前端文档](blog-vue/README.md)
+* blog-vue                           前端工程 [前端文档](blog-vue/README.md)
 * img                                    文档相关图片
 * other                                 其他文档
   * prototype.md		   原型文档
   * 踩坑整理.docx           写本项目遇到的坑
-* project                              已配置的项目压缩文件
+* conf                                   已配置的项目压缩文件
   * nginx.conf                 nginx配置文件，已配置好
 * blog.sql                             mysql数据库结构
 
@@ -38,7 +40,7 @@
 
 1. 水平所限，部分代码可能有坑
 2. 管理员账号 admin 密码 1
-3. 后面可能会加上mq/elasticsearch
+3. 后面可能会加上elasticsearch
 
 ... 
 

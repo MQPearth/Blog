@@ -1,6 +1,4 @@
-/*
-DataBase Encoding         : 65001/UTF-8
-*/
+
 
 SET FOREIGN_KEY_CHECKS=0;
 
@@ -13,6 +11,7 @@ CREATE TABLE `announcement` (
   `announcement_title` varchar(255) NOT NULL COMMENT '公告标题',
   `announcement_body` text NOT NULL COMMENT '公告内容',
   `announcement_top` int(11) NOT NULL COMMENT '是否置顶0 置顶 1未置顶',
+  `announcement_time` datetime NOT NULL COMMENT '发布时间',
   PRIMARY KEY (`announcement_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 
@@ -34,7 +33,7 @@ CREATE TABLE `blog` (
   `blog_state` int(11) NOT NULL COMMENT '博文状态--0 删除 1正常',
   `user_id` int(11) NOT NULL COMMENT '用户id',
   PRIMARY KEY (`blog_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of blog
@@ -80,7 +79,7 @@ CREATE TABLE `discuss` (
   `user_id` int(11) NOT NULL COMMENT '用户id',
   `blog_id` int(11) NOT NULL COMMENT '博文id',
   PRIMARY KEY (`discuss_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of discuss
@@ -102,22 +101,6 @@ CREATE TABLE `login` (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for mailkey
--- ----------------------------
-DROP TABLE IF EXISTS `mailkey`;
-CREATE TABLE `mailkey` (
-  `mailkey_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '唯一主键id',
-  `mailkey_mail` varchar(50) NOT NULL COMMENT '发送邮箱',
-  `mailkey_code` varchar(7) NOT NULL COMMENT '邮箱验证码',
-  `mailkey_sendTime` datetime NOT NULL COMMENT '发送时间',
-  PRIMARY KEY (`mailkey_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of mailkey
--- ----------------------------
-
--- ----------------------------
 -- Table structure for message
 -- ----------------------------
 DROP TABLE IF EXISTS `message`;
@@ -125,8 +108,9 @@ CREATE TABLE `message` (
   `message_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '留言唯一id',
   `message_name` varchar(30) NOT NULL COMMENT '游客保存为ip地址，用户保存用户名',
   `message_body` varchar(255) NOT NULL COMMENT '留言主体',
+  `message_time` datetime NOT NULL COMMENT '留言时间',
   PRIMARY KEY (`message_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of message
@@ -144,7 +128,7 @@ CREATE TABLE `reply` (
   `discuss_id` int(11) NOT NULL COMMENT '评论id',
   `reply_rootid` int(11) DEFAULT NULL COMMENT '父回复节点id',
   PRIMARY KEY (`reply_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of reply
@@ -175,7 +159,7 @@ CREATE TABLE `tag` (
   `tag_name` varchar(20) NOT NULL COMMENT '标签名',
   `user_id` int(11) NOT NULL COMMENT '用户id',
   PRIMARY KEY (`tag_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of tag
@@ -191,13 +175,14 @@ CREATE TABLE `user` (
   `user_password` varchar(255) NOT NULL COMMENT '用户密码',
   `user_mail` varchar(50) NOT NULL COMMENT '用户邮箱',
   `user_state` int(11) NOT NULL COMMENT '用户状态 0 封禁 1正常',
+  `user_reward` varchar(255) DEFAULT NULL COMMENT '用户打赏码图片路径',
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('1', 'admin', '$2a$10$usmASSUxqidbn2RrQi4jdeVWUcFyTfmwZgTxSy8FIXQ5CVpm/0qEa', 'kyaa077@gmail.com', '1');
+INSERT INTO `user` VALUES ('1', 'admin', '$2a$10$usmASSUxqidbn2RrQi4jdeVWUcFyTfmwZgTxSy8FIXQ5CVpm/0qEa', 'xxxxx@xxxx.com', '1');
 
 -- ----------------------------
 -- Table structure for user_role
@@ -208,10 +193,8 @@ CREATE TABLE `user_role` (
   `user_id` int(11) NOT NULL COMMENT '用户id',
   `role_id` int(11) NOT NULL COMMENT '角色id',
   PRIMARY KEY (`user_role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of user_role
 -- ----------------------------
-INSERT INTO `user_role` VALUES ('1', '1', '1');
-INSERT INTO `user_role` VALUES ('2', '1', '2');

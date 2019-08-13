@@ -1,5 +1,6 @@
 <template>
   <el-card id="account">
+
     <div id="updatePwd">
       <div>
         <h3>更改密码</h3>
@@ -29,7 +30,9 @@
         <el-button icon="el-icon-potato-strips" @click="updatePwd()">更改密码</el-button>
       </div>
     </div>
-    <el-divider></el-divider>
+
+    <el-divider/>
+
     <div id="updateMail">
       <div>
         <h3>改绑邮箱</h3>
@@ -61,6 +64,43 @@
         <el-button icon="el-icon-cherry" @click="updateMail()">改绑邮箱</el-button>
       </div>
     </div>
+
+    <el-divider/>
+
+    <div id="updateReward">
+      <div>
+        <h3>更新打赏码</h3>
+        <el-form ref="form" label-width="100px">
+          <el-form-item label="当前打赏码">
+            <el-image v-if="userReward!==''"
+                      style="width: 200px; height: 200px"
+                      :src="userReward"
+                      :fit="'fit'"/>
+            <span v-if="userReward===''">暂无</span>
+          </el-form-item>
+
+          <el-form-item label="更新打赏码">
+            <el-upload
+              class="avatar-uploader"
+              :action="upload"
+              :headers="getToken()"
+              :on-success="handleAvatarSuccess"
+              :show-file-list="false"
+              :before-upload="beforeAvatarUpload">
+              <img v-if="imageUrl" :src="imageUrl" class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
+          </el-form-item>
+
+
+        </el-form>
+      </div>
+      <div style="margin-left: 45%">
+        <el-button icon="el-icon-orange" @click="updateReward()">更新</el-button>
+      </div>
+    </div>
+
+
   </el-card>
 </template>
 
@@ -81,7 +121,10 @@
         newMailCode: '',  //新邮箱验证码
         updatePwdSendFlag: false,
         updateMailToOldSendFlag: false,
-        updateMailToNewSendFlag: false
+        updateMailToNewSendFlag: false,
+        imageUrl: '',
+        userReward: '',
+        upload: '/api/blog/uploadImg'
       }
     },
     created() {
@@ -92,6 +135,46 @@
         user.getUserMail().then(res => {
           this.mail = res.data;
         })
+        user.getUserReward().then(res => {
+
+          if (res.data === undefined) {
+            this.userReward = '';
+          } else {
+            this.userReward = res.data;
+          }
+        })
+      },
+      getToken() {
+        return {'Authorization': this.$store.state.token}
+      },
+      updateReward() {
+        if (this.imageUrl === '')
+          return;
+
+        user.updateReward(this.imageUrl).then(res => {
+          this.$message({
+            message: res.message,
+            type: 'success'
+          });
+          this.load();
+        })
+
+
+      },
+      handleAvatarSuccess(res, file) {
+        this.imageUrl = res.data;
+      },
+      beforeAvatarUpload(file) {
+        const isJPG = file.type === 'image/jpeg';
+        const isPNG = file.type === 'image/png';
+        const isLt2M = file.size / 1024 / 1024 < 1;
+        if (!isJPG && !isPNG) {
+          this.$message.error('图片不支持除 jpg/png 以外的格式');
+        }
+        if (!isLt2M) {
+          this.$message.error('打赏码图片大小不能超过 1MB!');
+        }
+        return true;
       },
 
       updatePwdSendMail() {  //更改密码发送验证码
@@ -126,7 +209,7 @@
           this.updatePwdSendFlag = false;
           this.updateMailToOldSendFlag = false;
           this.updateMailToNewSendFlag = false;
-        }).catch(()=>{
+        }).catch(() => {
           this.updatePwdSendFlag = false;
           this.updateMailToOldSendFlag = false;
           this.updateMailToNewSendFlag = false;
@@ -231,4 +314,36 @@
     padding-left: 30%;
     width: 30%;
   }
+
+  #updateReward {
+    padding-left: 30%;
+    width: 30%;
+  }
+
+  .avatar-uploader .el-upload {
+    border: 1px dashed #000000;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .avatar-uploader .el-upload:hover {
+    border-color: #000000;
+  }
+
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 176px;
+    height: 176px;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 176px;
+    height: 176px;
+    display: block;
+  }
+
 </style>

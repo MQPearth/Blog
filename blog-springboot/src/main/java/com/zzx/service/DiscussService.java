@@ -48,7 +48,7 @@ public class DiscussService {
      * @param discussBody
      * @param blogId
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void saveDiscuss(String discussBody, Integer blogId) {
         User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
         Blog blog = blogDao.findBlogById(blogId);
@@ -71,18 +71,21 @@ public class DiscussService {
      *
      * @param discussId
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteDiscuss(Integer discussId) {
         User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
         Discuss discuss = discussDao.findDiscussById(discussId);
-        if (discuss == null)
+        if (discuss == null) {
             throw new RuntimeException("评论不存在");
-        if (user.getId() != discuss.getUser().getId())
+        }
+        if (!user.getId().equals(discuss.getUser().getId())) {
             throw new RuntimeException("无权删除");
+        }
 
         discussDao.deleteDiscussById(discussId);
 
-        Integer rows = replyDao.deleteReplyByDiscussId(discussId); //返回受影响行数
+        //返回受影响行数
+        Integer rows = replyDao.deleteReplyByDiscussId(discussId);
 
 
         Blog blog = blogDao.findBlogById(discuss.getBlog().getId());
@@ -98,8 +101,9 @@ public class DiscussService {
      */
     public void adminDeleteDiscuss(Integer discussId) {
         Discuss discuss = discussDao.findDiscussById(discussId);
-        if (discuss == null)
+        if (discuss == null) {
             throw new RuntimeException("评论不存在");
+        }
         discussDao.deleteDiscussById(discussId);
 
         Integer rows = replyDao.deleteReplyByDiscussId(discussId); //返回受影响行数

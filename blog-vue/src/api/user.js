@@ -43,6 +43,19 @@ export default {
       method: 'get',
     })
   },
+  updateReward(filePath) {
+    return request({
+      url: '/user/updateReward',
+      method: 'put',
+      data: qs.stringify({'imgPath': filePath})
+    })
+  },
+  getUserReward() {
+    return request({
+      url: '/user/getReward',
+      method: 'get',
+    })
+  },
   updatePassword(oldPassword, newPassword, mailCode) {
     return request({
       url: '/user/updatePassword',
@@ -74,6 +87,13 @@ export default {
       url: '/user/ban/' + userId + '/' + userState,
       method: 'get',
     })
+  },
+  logout(){
+    return request({
+      url: '/user/logout',
+      method: 'get',
+    })
   }
+
 
 }

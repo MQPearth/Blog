@@ -9,6 +9,15 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {// 在这里配置如下代码 此配置只在npm run dev 下生效
+
+      '/api/ip':{   //外部接口
+        target: 'https://tool.lu/ip/ajax.html', //
+        changeOrigin: true, //
+        pathRewrite: {
+          // 路径重写
+          '^/api/ip': ''
+        }
+      },
       '/api': {
         target: 'http://127.0.0.1:8001/', //
         changeOrigin: true, //
@@ -17,7 +26,7 @@ module.exports = {
           '^/api': '/'
         }
       },
-      '/img': {     //图片资源默认以80端口发起请求
+      '/img': {     //图片资源默认以8001端口发起请求
         target: 'http://127.0.0.1:8001/', //
         changeOrigin: true, //
         pathRewrite: {

@@ -47,13 +47,14 @@ public class ReplyService {
      * @param replyBody
      * @param rootId    可为null
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void saveReply(Integer discussId, String replyBody, Integer rootId) {
         User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
         Reply reply = new Reply();
         Discuss discuss = discussDao.findDiscussById(discussId);
-        if (discuss == null)
+        if (discuss == null) {
             throw new RuntimeException("评论不存在");
+        }
 
         reply.setDiscuss(discuss);
         reply.setUser(user);
@@ -79,11 +80,13 @@ public class ReplyService {
     public void deleteReply(Integer replyId) {
         User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
         Reply reply = replyDao.findReplyById(replyId);
-        if (reply == null)
+        if (reply == null) {
             throw new RuntimeException("回复不存在");
+        }
 
-        if (user.getId() != reply.getUser().getId())
+        if (!user.getId().equals(reply.getUser().getId())) {
             throw new RuntimeException("无权删除");
+        }
 
         //删除回复
         replyDao.deleteReplyById(replyId);
@@ -103,8 +106,9 @@ public class ReplyService {
      */
     public void adminDeleteReply(Integer replyId) {
         Reply reply = replyDao.findReplyById(replyId);
-        if (reply == null)
+        if (reply == null) {
             throw new RuntimeException("回复不存在");
+        }
         //删除回复
         replyDao.deleteReplyById(replyId);
 

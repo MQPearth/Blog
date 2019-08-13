@@ -7,6 +7,9 @@
       <p style="color: #303133">
         {{message.body}}
       </p>
+      <p style="color: #C0C4CC;font-size:12px">
+        {{getTime(message.time)}}
+      </p>
 
       <el-divider content-position="right">
         <el-link :underline="false" class="el-icon-delete" v-if="getStoreRoles().indexOf('ADMIN') > -1"
@@ -31,7 +34,7 @@
 
     <div style="width: 60%;margin-left: -9%;padding-top: 2%" class="hidden-xs-only">
       <el-row>
-        <el-input  v-model="messageBody" placeholder="请输入留言内容" style="width: 40%" size="small"/>
+        <el-input v-model="messageBody" placeholder="请输入留言内容" style="width: 40%" size="small"/>
         <el-button type="primary" style="width: 15%" size="small" @click="sendMessage">
           留言
         </el-button>
@@ -41,6 +44,7 @@
 </template>
 <script>
   import message from '@/api/message'
+  import date from '@/utils/date'
   import 'element-ui/lib/theme-chalk/display.css';
 
   export default {
@@ -84,6 +88,7 @@
             type: 'success',
             message: '留言成功'
           });
+          this.messageBody = '';
           this.loadMessage();
         })
       },
@@ -105,6 +110,9 @@
       },
       getStoreRoles() { //获取store中存储的roles
         return this.$store.state.roles;
+      },
+      getTime(time) {//将时间戳转化为几分钟前，几小时前
+        return date.timeago(time);
       },
     },
   }

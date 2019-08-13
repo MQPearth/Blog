@@ -40,7 +40,7 @@ public class LoginService {
      *
      * @param user
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void saveLoginInfo(User user) {
 
         user = userDao.findUserByName(user.getName());

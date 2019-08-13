@@ -42,7 +42,9 @@ public class TagService {
 
 
         if (tagDao.findTagByTagName(tagName) != null) //mysql where tag_name 忽略大小写
+        {
             throw new RuntimeException("标签重复");
+        }
 
         Tag tag = new Tag();
         tag.setUser(user);
@@ -55,17 +57,19 @@ public class TagService {
      *
      * @param tagId
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteTagById(Integer tagId) {
         String username = jwtTokenUtil.getUsernameFromRequest(request);
         User user = userDao.findUserByName(username);
         Tag tag = tagDao.findTagById(tagId);
-        if (user.getId() != tag.getUser().getId())
+        if (!user.getId().equals(tag.getUser().getId())) {
             throw new RuntimeException("无权删除此标签");
+        }
 
         //查询此标签下是否有博文
-        if (blogDao.findBlogCountByTagId(tagId) > 0)
+        if (blogDao.findBlogCountByTagId(tagId) > 0) {
             throw new RuntimeException("此标签关联了博客");
+        }
 
         tagDao.deleteTag(tagId);
     }
@@ -80,8 +84,9 @@ public class TagService {
         String username = jwtTokenUtil.getUsernameFromRequest(request);
         User user = userDao.findUserByName(username);
         Tag tag = tagDao.findTagById(tagId);
-        if (user.getId() != tag.getUser().getId())
+        if (!user.getId().equals(tag.getUser().getId())) {
             throw new RuntimeException("无权修改此标签");
+        }
         tag.setName(tagName);
         tagDao.updateTagName(tag);
     }

@@ -28,8 +28,9 @@ public class MessageController {
     @ApiOperation(value = "留言", notes = "留言内容")
     @PostMapping
     public Result message(String messageBody) {
-        if (!formatUtil.checkStringNull(messageBody))
+        if (!formatUtil.checkStringNull(messageBody)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
 
         try {
             messageService.saveMessage(messageBody);
@@ -46,18 +47,26 @@ public class MessageController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{messageId}")
     public Result deleteMessage(@PathVariable Integer messageId) {
-        if (!formatUtil.checkPositive(messageId))
+        if (!formatUtil.checkPositive(messageId)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
         messageService.deleteMessageById(messageId);
         return Result.create(StatusCode.OK, "删除成功");
     }
 
-    //分页查询
+    /**
+     * 分页查询留言
+     *
+     * @param page      起始页
+     * @param showCount 显示条数
+     * @return 查询结果
+     */
     @ApiOperation(value = "分页查询留言", notes = "页码+显示数量")
     @GetMapping("/{page}/{showCount}")
     public Result getMessage(@PathVariable Integer page, @PathVariable Integer showCount) {
-        if (!formatUtil.checkPositive(page, showCount))
+        if (!formatUtil.checkPositive(page, showCount)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
 
         PageResult<Message> pageResult =
                 new PageResult<>(messageService.getMessageCount(), messageService.findMessage(page, showCount));

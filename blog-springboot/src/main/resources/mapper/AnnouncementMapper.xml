@@ -9,6 +9,7 @@
         <result property="title" column="announcement_title"/>
         <result property="body" column="announcement_body"/>
         <result property="top" column="announcement_top"/>
+        <result property="time" column="announcement_time"/>
     </resultMap>
 
     <insert id="saveAnnouncement" parameterType="Announcement">
@@ -33,7 +34,7 @@
     </select>
     
     <select id="findAnnouncement" resultMap="Announcement">
-        SELECT announcement_id,announcement_title,announcement_body,announcement_top
+        SELECT announcement_id,announcement_title,announcement_body,announcement_top,announcement_time
         FROM announcement
         ORDER BY announcement_top
         LIMIT #{start},#{showCount}

@@ -95,8 +95,16 @@ public interface UserDao {
 
     /**
      * 模糊查询用户名 返回记录数
+     *
      * @param userName
      * @return
      */
     Long getUserCountByName(String userName);
+
+    /**
+     * 更新用户打赏码
+     *
+     * @param user
+     */
+    void updateUserRewardById(User user);
 }

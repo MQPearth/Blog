@@ -20,9 +20,9 @@ export default {
       method: 'get'
     })
   },
-  getBlogById(id) {
+  getBlogById(id, isClick) {
     return request({
-      url: '/blog/' + id,
+      url: '/blog/' + id + '/' + isClick,
       method: 'get'
     })
   },

@@ -1,24 +1,21 @@
 package com.zzx.controller;
 
 
-import com.zzx.config.JwtConfig;
+import com.zzx.config.MailConfig;
 import com.zzx.model.entity.PageResult;
 import com.zzx.model.entity.Result;
 import com.zzx.model.entity.StatusCode;
 
-import com.zzx.model.pojo.Mailkey;
-
 import com.zzx.model.pojo.User;
 import com.zzx.service.LoginService;
-import com.zzx.service.MailkeyService;
 import com.zzx.service.RoleService;
 import com.zzx.service.UserService;
 import com.zzx.utils.DateUtil;
 import com.zzx.utils.FormatUtil;
-import com.zzx.utils.JwtTokenUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 
@@ -26,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 @Api(tags = "用户api", description = "用户api", basePath = "/user")
@@ -42,8 +40,6 @@ public class UserController {
     @Autowired
     private LoginService loginService;
 
-    @Autowired
-    private MailkeyService mailkeyService;
 
     @Autowired
     private FormatUtil formatUtil;
@@ -51,6 +47,8 @@ public class UserController {
     @Autowired
     private DateUtil dateUtil;
 
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
 
     /**
@@ -62,12 +60,21 @@ public class UserController {
     @ApiOperation(value = "用户登录", notes = "用户名+密码 name+password 返回token")
     @PostMapping("/login")
     public Result login(User user) {
-        if (!formatUtil.checkStringNull(user.getName(), user.getPassword()))
+        if (!formatUtil.checkStringNull(user.getName(), user.getPassword())) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
+        User dbUser = userService.findUserByName(user.getName());
+        if (null == dbUser) {
+            return Result.create(StatusCode.ERROR, "用户名或密码错误");
+        }
+        if (0 == dbUser.getState()) {
+            return Result.create(StatusCode.ERROR, "你已被封禁");
+        }
 
         Map map = userService.login(user);
         if (map != null) {
             //登录成功更新登录表
+            loginService.saveLoginInfo(user);
             return Result.create(StatusCode.OK, "登录成功", map);
         } else {
             return Result.create(StatusCode.LOGINERROR, "登录失败，用户名或密码错误");
@@ -76,32 +83,49 @@ public class UserController {
 
 
     /**
-     * 创建管理员
+     * 用户退出登录
+     * 删除redis中的token
      *
-     * @param user
+     * @param
      * @return
      */
-    @PreAuthorize("hasAuthority('USER')")
-    @ApiOperation(value = "创建管理员", notes = "用户名+密码+邮箱 name+password+mail")
-    @PostMapping("/createAdmin")
-    public Result createAdmin(User user) {
-        if (!formatUtil.checkStringNull(user.getName(), user.getPassword(), user.getMail()))
-            return Result.create(StatusCode.ERROR, "参数错误");
+    @ApiOperation(value = "用户退出登录")
+    @GetMapping("/logout")
+    public Result logout() {
 
-        //查询是否已有管理员
-        Integer count = roleService.findAdminRoleCount("ADMIN");
-        if (count > 0)
-            return Result.create(StatusCode.ACCESSERROR, "拒绝访问");
-        else {
-            //无 创建
-            try {
-                userService.createAdmin(user);
-                return Result.create(StatusCode.OK, "管理员创建成功");
-            } catch (RuntimeException e) {
-                return Result.create(StatusCode.OK, "创建失败，" + e.getMessage());
-            }
-        }
+        userService.logout();
+        return Result.create(StatusCode.OK, "退出成功");
     }
+
+
+//    /**
+//     * 创建管理员
+//     *
+//     * @param user
+//     * @return
+//     */
+//    @PreAuthorize("hasAuthority('USER')")
+//    @ApiOperation(value = "创建管理员", notes = "用户名+密码+邮箱 name+password+mail")
+//    @PostMapping("/createAdmin")
+//    public Result createAdmin(User user) {
+//        if (!formatUtil.checkStringNull(user.getName(), user.getPassword(), user.getMail())) {
+//            return Result.create(StatusCode.ERROR, "参数错误");
+//        }
+//
+//        //查询是否已有管理员
+//        Integer count = roleService.findAdminRoleCount("ADMIN");
+//        if (count > 0) {
+//            return Result.create(StatusCode.ACCESSERROR, "拒绝访问");
+//        } else {
+//            //无 创建
+//            try {
+//                userService.createAdmin(user);
+//                return Result.create(StatusCode.OK, "管理员创建成功");
+//            } catch (RuntimeException e) {
+//                return Result.create(StatusCode.OK, "创建失败，" + e.getMessage());
+//            }
+//        }
+//    }
 
     /**
      * 用户注册
@@ -119,8 +143,9 @@ public class UserController {
                 mailCode,
                 user.getPassword(),
                 user.getMail(),
-                inviteCode))
+                inviteCode)) {
             return Result.create(StatusCode.ERROR, "注册失败，字段不完整");
+        }
         try {
             userService.register(user, mailCode, inviteCode);
             return Result.create(StatusCode.OK, "注册成功");
@@ -142,8 +167,9 @@ public class UserController {
     @GetMapping("/ban/{id}/{state}")
     public Result banUser(@PathVariable Integer id, @PathVariable Integer state) {
 
-        if (!formatUtil.checkObjectNull(id, state))
+        if (!formatUtil.checkObjectNull(id, state)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
 
 
         if (state == 0) {
@@ -152,14 +178,15 @@ public class UserController {
         } else if (state == 1) {
             userService.updateUserState(id, state);
             return Result.create(StatusCode.OK, "解禁成功");
-        } else
+        } else {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
     }
 
 
     /**
      * 发送验证邮件
-     * 同步发送
+     * 异步发送
      *
      * @param mail
      * @return
@@ -169,23 +196,38 @@ public class UserController {
     public Result sendMail(String mail) {
 
         //邮箱格式校验
-        if (!(formatUtil.checkStringNull(mail)) || (!formatUtil.checkMail(mail)))
+        if (!(formatUtil.checkStringNull(mail)) || (!formatUtil.checkMail(mail))) {
             return Result.create(StatusCode.ERROR, "邮箱格式错误");
+        }
+        String redisMailCode = userService.getMailCodeFromRedis(mail);
 
-        Mailkey mailkey = mailkeyService.findMailkeyByMail(mail);
-        if (mailkey != null) {//此邮箱发送过验证码
-            long diff = dateUtil.dateDiffMinute(mailkey.getSendTime());//获得相差分钟数
-            if (diff > 5) {//上一次发送距现在超过五分钟
-                //发送邮件
-                mailkeyService.sendMail(mail);
-                return Result.create(StatusCode.OK, "发送成功");
-            } else
-                return Result.create(StatusCode.ERROR, "五分钟内不可重发验证码");
+        //此邮箱发送过验证码
+        if (redisMailCode != null) {
+
+            return Result.create(StatusCode.ERROR, MailConfig.EXPIRED_TIME + "分钟内不可重发验证码");
         } else {
-            mailkeyService.sendMail(mail);
+            userService.sendMail(mail);
+
             return Result.create(StatusCode.OK, "发送成功");
         }
     }
+
+    /**
+     * 更新用户打赏码
+     *
+     * @return
+     */
+    @ApiOperation(value = "更新用户打赏码", notes = "更新用户打赏码")
+    @PreAuthorize("hasAuthority('USER')")
+    @PutMapping("/updateReward")
+    public Result updateReward(String imgPath) {
+        if (!formatUtil.checkStringNull(imgPath)) {
+            return Result.create(StatusCode.ERROR, "格式错误");
+        }
+        userService.updateUserReward(imgPath);
+        return Result.create(StatusCode.OK, "更新成功");
+    }
+
 
     /**
      * 获取用户绑定的邮箱
@@ -200,6 +242,18 @@ public class UserController {
     }
 
     /**
+     * 获取用户的打赏码
+     *
+     * @return
+     */
+    @ApiOperation(value = "获取用户的打赏码", notes = "获取用户的打赏码")
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping("/getReward")
+    public Result getUserReward() {
+        return Result.create(StatusCode.OK, "查询成功", userService.findUserReward());
+    }
+
+    /**
      * 修改密码
      *
      * @param oldPassword 旧密码
@@ -211,8 +265,9 @@ public class UserController {
     @PreAuthorize("hasAuthority('USER')")
     @PostMapping("/updatePassword")
     public Result updatePassword(String oldPassword, String newPassword, String code) {
-        if (!formatUtil.checkStringNull(oldPassword, newPassword, code))
+        if (!formatUtil.checkStringNull(oldPassword, newPassword, code)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
         try {
             userService.updateUserPassword(oldPassword, newPassword, code);
             return Result.create(StatusCode.OK, "修改密码成功");
@@ -234,11 +289,13 @@ public class UserController {
     @PreAuthorize("hasAuthority('USER')")
     @PostMapping("/updateMail")
     public Result updateMail(String newMail, String oldMailCode, String newMailCode) {
-        if (!formatUtil.checkStringNull(newMail, oldMailCode, newMailCode))
+        if (!formatUtil.checkStringNull(newMail, oldMailCode, newMailCode)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
         //检查邮箱格式
-        if (!formatUtil.checkMail(newMail))
+        if (!formatUtil.checkMail(newMail)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
         try {
             userService.updateUserMail(newMail, oldMailCode, newMailCode);
             return Result.create(StatusCode.OK, "改绑成功");
@@ -259,8 +316,9 @@ public class UserController {
     @PostMapping("/forgetPassword")
     public Result forgetPassword(String userName, String mailCode, String newPassword) {
 
-        if (!formatUtil.checkStringNull(userName, mailCode, newPassword))
+        if (!formatUtil.checkStringNull(userName, mailCode, newPassword)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
 
         try {
             userService.forgetPassword(userName, mailCode, newPassword);
@@ -292,8 +350,9 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/{page}/{showCount}")
     public Result findUser(@PathVariable Integer page, @PathVariable Integer showCount) {
-        if (!formatUtil.checkPositive(page, showCount))
+        if (!formatUtil.checkPositive(page, showCount)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
         PageResult<User> pageResult =
                 new PageResult<>(userService.getUserCount(), userService.findUser(page, showCount));
         return Result.create(StatusCode.OK, "查询成功", pageResult);
@@ -304,10 +363,12 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/search/{page}/{showCount}")
     public Result searchUser(String userName, @PathVariable Integer page, @PathVariable Integer showCount) {
-        if (!formatUtil.checkStringNull(userName))
+        if (!formatUtil.checkStringNull(userName)) {
             return Result.create(StatusCode.ERROR, "参数错误");
-        if (!formatUtil.checkPositive(page, showCount))
+        }
+        if (!formatUtil.checkPositive(page, showCount)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
         PageResult<User> pageResult =
                 new PageResult<>(userService.getUserCountByName(userName), userService.searchUserByName(userName, page, showCount));
 
@@ -317,7 +378,7 @@ public class UserController {
 
     //以下是权限测试方法
 
-//    @ApiOperation(value = "游客权限测试", notes = "测试")
+    //    @ApiOperation(value = "游客权限测试", notes = "测试")
 //    @GetMapping
 //    public Result test() {
 //        return Result.create(StatusCode.OK, "游客");

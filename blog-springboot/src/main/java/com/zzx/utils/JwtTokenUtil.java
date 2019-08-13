@@ -1,7 +1,6 @@
 package com.zzx.utils;
 
 
-
 import com.zzx.config.JwtConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -24,6 +23,7 @@ public class JwtTokenUtil implements Serializable {
 
     private static final String CLAIM_KEY_USERNAME = "sub";
     private static final String CLAIM_KEY_CREATED = "created";
+    private static final String CLAIM_KEY_ROLES = "roles";
 
     @Autowired
     private JwtConfig jwtConfig;
@@ -64,7 +64,7 @@ public class JwtTokenUtil implements Serializable {
         Date created;
         try {
             final Claims claims = getClaimsFromToken(token);
-            created = new Date((Long) claims.get(CLAIM_KEY_CREATED));
+            created = new Date((Long)claims.get(CLAIM_KEY_CREATED));
         } catch (Exception e) {
             created = null;
         }
@@ -102,7 +102,7 @@ public class JwtTokenUtil implements Serializable {
     }
 
     /**
-     * 生成过期时间
+     * 生成过期时间 单位[ms]
      *
      * @return
      */
@@ -113,6 +113,7 @@ public class JwtTokenUtil implements Serializable {
     /**
      * token是否过期
      * true 过期 false 未过期
+     *
      * @param token
      * @return
      */
@@ -134,15 +135,16 @@ public class JwtTokenUtil implements Serializable {
      * @return
      */
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
+        Map<String, Object> claims = new HashMap<>(3);
         claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername()); //放入用户名
         claims.put(CLAIM_KEY_CREATED, new Date());//放入token生成时间
-
         List<String> roles = new ArrayList<>();
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
         for (GrantedAuthority authority : authorities) {
             roles.add(authority.getAuthority());
         }
+        claims.put(CLAIM_KEY_ROLES, roles);//放入用户权限
+
         return generateToken(claims);
     }
 
@@ -189,6 +191,23 @@ public class JwtTokenUtil implements Serializable {
                 &&
                 !isTokenExpired(token) //校验是否过期
         );
+    }
+
+    /**
+     * 从token中获取用户角色
+     *
+     * @param authToken
+     * @return
+     */
+    public List<String> getRolesFromToken(String authToken) {
+        List<String> roles;
+        try {
+            final Claims claims = getClaimsFromToken(authToken);
+            roles = (List<String>)claims.get(CLAIM_KEY_ROLES);
+        } catch (Exception e) {
+            roles = null;
+        }
+        return roles;
     }
 }
 

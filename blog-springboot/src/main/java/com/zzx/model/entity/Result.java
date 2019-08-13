@@ -1,22 +1,30 @@
 package com.zzx.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * 返回结果实体类
  */
 
 @ApiModel("响应实体")
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Data
+@ToString
 public class Result {
 
-    @ApiModelProperty(value = "返回码",dataType = "Integer")
+    @ApiModelProperty(value = "返回码", dataType = "Integer")
     private Integer code;// 返回码
 
-    @ApiModelProperty(value = "返回信息",dataType = "String")
+    @ApiModelProperty(value = "返回信息", dataType = "String")
     private String message;//返回信息
 
-    @ApiModelProperty(value = "返回数据",dataType = "object")
+    @ApiModelProperty(value = "返回数据", dataType = "object")
     private Object data;// 返回数据
 
     private Result() {
@@ -45,27 +53,7 @@ public class Result {
     }
 
 
-    public Integer getCode() {
-        return code;
-    }
 
-    public void setCode(Integer code) {
-        this.code = code;
-    }
 
-    public String getMessage() {
-        return message;
-    }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Object getData() {
-        return data;
-    }
-
-    public void setData(Object data) {
-        this.data = data;
-    }
 }

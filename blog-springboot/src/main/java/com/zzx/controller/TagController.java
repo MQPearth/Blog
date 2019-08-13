@@ -33,8 +33,9 @@ public class TagController {
     @PreAuthorize("hasAuthority('USER')")
     @PostMapping
     public Result newTag(String tagName) {
-        if (!formatUtil.checkStringNull(tagName))
+        if (!formatUtil.checkStringNull(tagName)) {
             return Result.create(StatusCode.ERROR, "参数异常");
+        }
         try {
             tagService.saveTag(tagName);
             return Result.create(StatusCode.OK, "新增成功");
@@ -53,8 +54,9 @@ public class TagController {
     @PreAuthorize("hasAuthority('USER')")
     @DeleteMapping("/{tagId}")
     public Result deleteTag(@PathVariable Integer tagId) {
-        if (!formatUtil.checkObjectNull(tagId))
+        if (!formatUtil.checkObjectNull(tagId)) {
             return Result.create(StatusCode.ERROR, "参数异常");
+        }
         try {
             tagService.deleteTagById(tagId);
             return Result.create(StatusCode.OK, "删除成功");
@@ -75,10 +77,12 @@ public class TagController {
     @PreAuthorize("hasAuthority('USER')")
     @PutMapping
     public Result updateTag(Integer tagId, String tagName) {
-        if (!formatUtil.checkObjectNull(tagId))
+        if (!formatUtil.checkObjectNull(tagId)) {
             return Result.create(StatusCode.ERROR, "参数异常");
-        if (!formatUtil.checkStringNull(tagName))
+        }
+        if (!formatUtil.checkStringNull(tagName)) {
             return Result.create(StatusCode.ERROR, "参数异常");
+        }
 
         try {
             tagService.updateTag(tagId, tagName);

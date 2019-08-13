@@ -12,7 +12,9 @@
         &nbsp;{{announcement.title}}
       </p>
       <div style="color: #303133" :id="announcement.id" v-html="announcement.body"/>
-
+      <p style="color: #C0C4CC;font-size:12px">
+        {{getTime(announcement.time)}}
+      </p>
       <el-divider/>
     </div>
 
@@ -35,6 +37,7 @@
 </template>
 <script>
   import announcement from '@/api/announcement'
+  import date from '@/utils/date'
 
   export default {
     name: 'announcement',
@@ -73,6 +76,9 @@
       },
       getStoreRoles() { //获取store中存储的roles
         return this.$store.state.roles;
+      },
+      getTime(time) {//将时间戳转化为几分钟前，几小时前
+        return date.timeago(time);
       }
     },
   }

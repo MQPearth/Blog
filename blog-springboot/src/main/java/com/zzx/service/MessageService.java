@@ -6,6 +6,7 @@ import com.zzx.dao.MessageDao;
 import com.zzx.dao.UserDao;
 import com.zzx.model.pojo.Message;
 import com.zzx.model.pojo.User;
+import com.zzx.utils.DateUtil;
 import com.zzx.utils.FormatUtil;
 import com.zzx.utils.JwtTokenUtil;
 import com.zzx.utils.RequestUtil;
@@ -38,6 +39,9 @@ public class MessageService {
     @Autowired
     private FormatUtil formatUtil;
 
+    @Autowired
+    private DateUtil dateUtil;
+
     /**
      * 留言
      *
@@ -53,12 +57,14 @@ public class MessageService {
             name = requestUtil.getIpAddress(request);
         }
         //查询此ip/name 是否留言过
-        if (messageDao.findMessageByName(name) != null)
+        if (messageDao.findMessageByName(name) != null) {
             throw new RuntimeException("你已留过言");
+        }
 
         Message message = new Message();
         message.setName(name);
         message.setBody(messageBody);
+        message.setTime(dateUtil.getCurrentDate());
         messageDao.saveMessage(message);
     }
 

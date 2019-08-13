@@ -34,15 +34,16 @@ service.interceptors.response.use(
      */
     const res = response.data
 
-    if (res.code !== 200) {
+    if ((typeof (res.code) != "undefined" && res.code != 200) || (typeof (res.status) != "undefined" && res.status != true)) {
 
-      if (res.code != 403) {
+      if (typeof (res.code) != "undefined" && res.code != 403) {
         //开发环境
         // Message({
         //   message: res.code + ' : ' + res.message,
         //   type: 'error',
         //   duration: 5 * 1000
         // })
+
         //生产环境
         Message({
           message: res.message,
@@ -50,7 +51,14 @@ service.interceptors.response.use(
           duration: 5 * 1000
         })
       }
-      
+
+      if (typeof (res.status) != "undefined" && res.status != true) {
+        Message({
+          message: '远程接口错误',
+          type: 'error',
+          duration: 5 * 1000
+        })
+      }
       // 403:Token过期 或 权限不足(恶意访问/被封禁) ;
       if (res.code === 403) {
         store.commit('logout');
@@ -82,8 +90,7 @@ service.interceptors.response.use(
     var message;
     if (error.response.status == 504) {
       message = '连接超时'
-    }
-    else {
+    } else {
       message = error.message
     }
     Message({

@@ -105,13 +105,13 @@
 
       },
       bodyTran(body) { //将数据库中带标签的博文转换为纯文本
+
         var dd = body.replace(new RegExp('#', 'g'), "");
         dd = dd.replace(new RegExp('!\\[.*\\]\\(.*\\)', 'g'), "[图片]");
         dd = dd.replace(new RegExp('\\[.*\\]\\(.*\\)', 'g'), "[链接]");
         dd = dd.replace(new RegExp('-', 'g'), "");
         dd = dd.replace(new RegExp('>', 'g'), "");
         dd = dd.replace(new RegExp('`', 'g'), "");
-        dd = dd.substring(0, 150)
         return dd;
       },
       editBlog(id) {

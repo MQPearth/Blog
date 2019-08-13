@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://192.168.125.101:3306/blog?useUnicode=true&characterEncoding=utf8&useSSL=false
+    url: jdbc:mysql://192.168.43.150:3306/blog?useUnicode=true&characterEncoding=utf8&useSSL=false
     username: root
     password: admin
     driverClassName: com.mysql.jdbc.Driver
@@ -20,9 +20,9 @@ spring:
   ###邮箱配置
   mail:
     host: smtp.qq.com
-    username: 1970432392@qq.com
-    #QQ邮箱的授权码 这个是假的
-    password: fwvgmqvaemoiedib
+    port: 25
+    username: ****@****.com
+    password: *******
     default-encoding: UTF-8
     properties:
       mail:
@@ -31,6 +31,24 @@ spring:
           starttls:
             enable: true
             required: true
+
+  ###Redis
+  redis:
+    host: 192.168.43.150
+    port: 6379
+    timeout: 1000
+    jedis:
+      pool:
+        max-active: 10
+        max-idle: 8
+        min-idle: 2
+        max-wait: 100
+  ###RabbitMQ
+  rabbitmq:
+    host: 192.168.43.150
+    port: 5672
+    username: guest
+    password: guest
 
 mybatis:
   ###数据库模型对象
@@ -42,11 +60,17 @@ mybatis:
 
 ###是否启用swagger
 swagger:
-  enable: true
+  enable: false
 
 logging:
   level:
     org.springframework.security: info
+    root: info
+  path: e:/springboot-blog
+
+
+
+
 
 
 ### jwt
@@ -54,7 +78,7 @@ jwt:
   ###过期时间 s数432000 5天
   time: 432000
   ###安全密钥
-  secret: "BlogKUDXSecret"
+  secret: "BlogSecret"
   ###token前缀
   prefix: "Bearer "
   ###http头key

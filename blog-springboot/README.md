@@ -10,6 +10,8 @@
 * swagger-ui api
 * springboot-mail
 * druid
+* redis
+* rabbitmq
 * restful api
 * 前后端分离
 

@@ -52,27 +52,26 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader(jwtConfig.getHeader());
 
         if (authHeader != null && authHeader.startsWith(jwtConfig.getPrefix())) {
-            final String authToken = authHeader.substring(jwtConfig.getPrefix().length());//除去前缀，获取token
-            String username = jwtTokenUtil.getUsernameFromToken(authToken);//获取token中的用户名
-            if (username != null) {  //非法token或token过期
+//            final String authToken = authHeader.substring(jwtConfig.getPrefix().length());//除去前缀，获取token
+            UserDetails userDetails = userService.loadUserByToken(authHeader);
+
+            if (null != userDetails) {
+
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {  //此请求是否校验过
 
-                    UserDetails userDetails = userService.loadUserByUsername(username);  //被封禁的用户将会失去USER权限，只有NORMAL权限
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                    if (username.equals(userDetails.getUsername())) {
-
-                        UsernamePasswordAuthenticationToken authentication =
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                    } else //token校验失败
-                        giveFlag = true;
                 }
-            } else //token校验失败
+            } else {
                 giveFlag = true;
-        } else  //未携带token
+            }
+        } else //token校验失败
+        {
             giveFlag = true;
+        }
 
 
         if (giveFlag) {

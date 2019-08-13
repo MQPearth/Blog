@@ -5,6 +5,7 @@ function timeago(timestamp) { //将时间转化成离现在几分钟，几小时
   var diffMs = Date.now() - timestamp;//相差的毫秒数
   var diff = (diffMs) / 1000 / 60 / 60;  //相差的时间 小时数
   if (diff >= 24) {  //时间差大于24个小时 显示标准时间 例：2019.6.5 00:26:11
+    // alert(date.toLocaleString())
     var year = date.getFullYear();
     var month = date.getMonth() + 1;
     var day = date.getDate();
@@ -20,7 +21,7 @@ function timeago(timestamp) { //将时间转化成离现在几分钟，几小时
 
     return year + '.' + month + '.' + day + ' ' + hours + ':' + minutes + ':' + seconds;
   }
-  else { //小于12小时 显示 时间差 例：2小时前
+  else { //小于24小时 显示 时间差 例：2小时前
 
     var mistiming = Math.round((diffMs) / 1000);
     var arrr = ['年', '个月', '星期', '天', '小时', '分钟', '秒'];

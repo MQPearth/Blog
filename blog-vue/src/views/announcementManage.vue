@@ -162,7 +162,7 @@
         })
       },
       substring(txt) {
-        txt = txt.replace(new RegExp('<.*/>', 'g'), '');
+        txt = txt.replace(new RegExp('<.*>', 'g'), '<标签>');
 
         if (txt.length > 50)
           return txt.substring(0, 50) + '...';

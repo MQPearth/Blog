@@ -35,8 +35,9 @@ public class CodeController {
     @ApiOperation(value = "分页查询激活码", notes = "页码+显示条数")
     @GetMapping("/{page}/{showCount}")
     public Result findCode(@PathVariable Integer page, @PathVariable Integer showCount) {
-        if (!formatUtil.checkPositive(page, showCount))
+        if (!formatUtil.checkPositive(page, showCount)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
 
         PageResult<Code> pageResult =
                 new PageResult<>(codeService.getCodeCount(), codeService.findCode(page, showCount));

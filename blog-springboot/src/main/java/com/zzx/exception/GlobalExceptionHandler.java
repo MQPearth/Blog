@@ -2,6 +2,7 @@ package com.zzx.exception;
 
 import com.zzx.model.entity.Result;
 import com.zzx.model.entity.StatusCode;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
-
 
 
 /**
@@ -50,6 +50,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 请求方式错误
+     *
      * @param e
      * @return
      */
@@ -79,6 +80,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 单次上传文件过大
+     *
      * @param e
      * @return
      */
@@ -88,6 +90,17 @@ public class GlobalExceptionHandler {
         return Result.create(StatusCode.ERROR, "文件过大");
     }
 
+    /**
+     * 客户端错误
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(ClientAbortException.class)
+    public Result clientAbortExceptionException(Exception e) {
+//        e.printStackTrace();
+        return Result.create(StatusCode.ERROR, "客户端错误");
+    }
 
 
     /**

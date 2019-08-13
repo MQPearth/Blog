@@ -14,10 +14,10 @@ public class RandomUtil {
      * 返回指定范围内的随机数
      *
      * @param start 开始 --包括
-     * @param end 结束 -- 包括
+     * @param end   结束 -- 包括
      * @return
      */
-    public int nextInt(int start, int end) {
+    public synchronized int nextInt(int start, int end) {
         return random.nextInt(end - start) + start + 1;  // +1:包括右界值
     }
 }

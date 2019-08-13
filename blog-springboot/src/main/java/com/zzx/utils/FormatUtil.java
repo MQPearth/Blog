@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 public class FormatUtil {
 
 
-    private static final Pattern mailPattern = Pattern.compile("\\w+@\\w+(\\.\\w{2,3})*\\.\\w{2,3}");//邮箱格式
+    private static final Pattern MAIL_PATTERN = Pattern.compile("\\w+@\\w+(\\.\\w{2,3})*\\.\\w{2,3}");//邮箱格式
 
-    private static final Pattern ipPattern = Pattern.compile("([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}");//ip格式
+    private static final Pattern IP_PATTERN = Pattern.compile("([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}");//ip格式
 
     /**
      * 邮箱格式校验
@@ -22,7 +22,7 @@ public class FormatUtil {
      * @return
      */
     public boolean checkMail(String mail) {
-        Matcher m = mailPattern.matcher(mail);
+        Matcher m = MAIL_PATTERN.matcher(mail);
         return m.matches();
     }
 
@@ -35,8 +35,9 @@ public class FormatUtil {
      */
     public boolean checkStringNull(String... strs) {
         for (String str : strs) {
-            if (str == null || "".equals(str))
+            if (str == null || "".equals(str)) {
                 return false;
+            }
         }
         return true;
     }
@@ -49,8 +50,9 @@ public class FormatUtil {
      */
     public boolean checkObjectNull(Object... objs) {
         for (Object obj : objs) {
-            if (obj == null)
+            if (obj == null) {
                 return false;
+            }
         }
         return true;
     }
@@ -63,9 +65,13 @@ public class FormatUtil {
      * @return
      */
     public String getFileFormat(String fileName) {
-        String[] formatNames = fileName.split("\\.");
-        if (formatNames == null || formatNames.length <= 1)
+        if (null == fileName) {
             return null;
+        }
+        String[] formatNames = fileName.split("\\.");
+        if (formatNames.length <= 1) {
+            return null;
+        }
         String format = "." + formatNames[formatNames.length - 1];
         return format;
     }
@@ -79,8 +85,9 @@ public class FormatUtil {
      */
     public boolean checkNotNegative(Integer... numbers) {
         for (Integer number : numbers) {
-            if (number < 0)
+            if (number < 0) {
                 return false;
+            }
         }
         return true;
     }
@@ -93,8 +100,9 @@ public class FormatUtil {
      */
     public boolean checkPositive(Integer... numbers) {
         for (Integer number : numbers) {
-            if (number <= 0)
+            if (number <= 0) {
                 return false;
+            }
         }
         return true;
     }
@@ -109,7 +117,7 @@ public class FormatUtil {
     }
 
     public boolean checkIP(String name) {
-        Matcher m = ipPattern.matcher(name);
+        Matcher m = IP_PATTERN.matcher(name);
         return m.matches();
     }
 }

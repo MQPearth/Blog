@@ -29,9 +29,9 @@ public class FileUtil {
        
         while (iterator.hasNext()) { 
 			File file = iterator.next();
-            if (file.listFiles().length < imgUploadConfig.getFolderSize())
+            if (file.listFiles().length < imgUploadConfig.getFolderSize()) {
                 return file.getPath();
-            else {
+            } else {
                 availablePath.remove(file);
             }
         }

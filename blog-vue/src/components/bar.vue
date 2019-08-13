@@ -21,15 +21,17 @@
           </div>
 
 
-          <el-menu-item class="hidden-xs-only" v-if="this.$store.state.token==''" index="" @click="loginFormVisible = true">
+          <el-menu-item class="hidden-xs-only" v-if="this.$store.state.token==''" index=""
+                        @click="loginFormVisible = true">
             <el-button type="text">登录</el-button>
           </el-menu-item>
 
-          <el-menu-item class="hidden-xs-only" v-if="this.$store.state.token==''" index="" @click="registerFormVisible = true">
+          <el-menu-item class="hidden-xs-only" v-if="this.$store.state.token==''" index=""
+                        @click="registerFormVisible = true">
             <el-button type="text">注册</el-button>
           </el-menu-item>
 
-          <el-dialog title="登录" :visible.sync="loginFormVisible" width="20%">
+          <el-dialog title="登录" :visible.sync="loginFormVisible" width="21%">
             <el-form :model="form">
               <el-form-item :label-width="formLabelWidth">
                 <el-input v-model="form.loginName" placeholder="用户名" prefixIcon="el-icon-user-solid"/>
@@ -81,7 +83,7 @@
           </el-dialog>
 
 
-          <el-submenu class="hidden-xs-only" index="" v-if="this.$store.state.token!==''" :router="true">
+          <el-submenu class="hidden-xs-only" index="4" v-if="this.$store.state.token!==''" :router="true">
             <template slot="title">[&nbsp;&nbsp;{{this.$store.state.name}}&nbsp;&nbsp;]</template>
 
             <el-menu-item route="/newBlog" index="4-1">&nbsp;&nbsp;&nbsp;
@@ -104,7 +106,7 @@
             </el-menu-item>
 
             <el-menu-item @click="logout">&nbsp;&nbsp;&nbsp;
-              <i class="el-icon-switch-button"></i>退出登录
+              <i class="el-icon-switch-button"/>退出登录
             </el-menu-item>
           </el-submenu>
 
@@ -143,10 +145,28 @@
         sendMailFlag: false
       }
     },
+    watch: {
+      // 监控当前页面path，防止刷新页面显示错误
+      '$route.path': {
+        deep: true,
+        immediate: true,
+        handler(to, from) {
+          if (to === '/') {
+            this.activeIndex = '1'
+          } else if (to === '/message') {
+            this.activeIndex = '2'
+          } else if (to === '/announcement') {
+            this.activeIndex = '3'
+          } else {
+            this.activeIndex = '4'
+          }
+        }
+      }
+    },
     methods: {
       handleSelect(key, keyPath) {
 //        console.log(key, keyPath);
-        if (key != null && key != '')
+        if (key != null && key !== '')
           this.activeIndex = key
       },
       egg() {
@@ -176,14 +196,17 @@
         })
       },
       logout() {  //退出登录
-        this.$store.commit('logout')//清除token等信息
-        this.$message({
-          message: '退出成功',
-          type: 'success'
-        });
-        this.$router.push({ //路由跳转
-          path: '/'
+        user.logout().then(res => {
+          this.$store.commit('logout')//清除token等信息
+          this.$message({
+            message: '退出成功',
+            type: 'success'
+          });
+          this.$router.push({ //路由跳转
+            path: '/'
+          })
         })
+
       },
       sendMail() {//发送邮件
 
@@ -216,7 +239,7 @@
           });
           return;
         }
-        if (this.form.registerPwd != this.form.registerConfirmPwd) {
+        if (this.form.registerPwd !== this.form.registerConfirmPwd) {
           this.$message({
             message: '两次密码不一致',
             type: 'error'

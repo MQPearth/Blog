@@ -26,10 +26,12 @@ public class ReplyController {
     @PostMapping("/{discussId}")
     public Result reply(@PathVariable Integer discussId, String replyBody, Integer rootId) {
 
-        if (!formatUtil.checkStringNull(replyBody))
+        if (!formatUtil.checkStringNull(replyBody)) {
             return Result.create(StatusCode.ERROR, "参数异常");
-        if (!formatUtil.checkPositive(discussId))
+        }
+        if (!formatUtil.checkPositive(discussId)) {
             return Result.create(StatusCode.ERROR, "参数异常");
+        }
 
         try {
             replyService.saveReply(discussId, replyBody, rootId);
@@ -43,8 +45,9 @@ public class ReplyController {
     @PreAuthorize("hasAuthority('USER')")
     @DeleteMapping("/{replyId}")
     public Result deleteReply(@PathVariable Integer replyId) {
-        if (!formatUtil.checkPositive(replyId))
+        if (!formatUtil.checkPositive(replyId)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
 
         try {
             replyService.deleteReply(replyId);
@@ -58,8 +61,9 @@ public class ReplyController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/admin/{replyId}")
     public Result adminDeleteDiscuss(@PathVariable Integer replyId) {
-        if (!formatUtil.checkPositive(replyId))
+        if (!formatUtil.checkPositive(replyId)) {
             return Result.create(StatusCode.ERROR, "参数错误");
+        }
 
         try {
             replyService.adminDeleteReply(replyId);

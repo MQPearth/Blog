@@ -66,7 +66,7 @@
         tag.getTag().then(res => {
           this.tags = res.data;
         })
-        blog.getBlogById(this.blogId).then(res => {
+        blog.getBlogById(this.blogId,true).then(res => {
           this.title = res.data.title;
           this.body = res.data.body;
           this.checkboxGroup = res.data.tags.map(t => t.id) // 填充标签
