@@ -16,6 +16,7 @@
 
     <div>
       <el-pagination
+        :pager-count="5"
         :page-size="pageSize"
         background
         layout="prev, pager, next"
