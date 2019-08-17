@@ -34,7 +34,7 @@
 * 后台 ![后台](img/admin_demo.png)
 
 #### docker 部署教程
-[Docker 部署本站 详细全过程 附代码](http://134.175.116.44/#/blog/2)
+[Docker 部署本站 详细全过程 附代码](https://blog.22xcode.com/#/blog/2)
 
 ##### Tips
 
