@@ -40,8 +40,8 @@
         <el-table-column label="最后登录时间" width="180">
           <template slot-scope="scope">
             <i class="el-icon-time"></i>
-            <span style="margin-left: 10px" v-if="scope.row.login!==null">{{ getTime(scope.row.login.time) }}</span>
-            <span style="margin-left: 10px" v-if="scope.row.login===null">暂无记录</span>
+            <span style="margin-left: 10px" v-if="!(typeof(scope.row.login) == 'undefined') && scope.row.login!==null">{{ getTime(scope.row.login.time) }}</span>
+            <span style="margin-left: 10px" v-if="(typeof(scope.row.login) == 'undefined') ||scope.row.login===null">暂无记录</span>
           </template>
         </el-table-column>
 
@@ -49,11 +49,11 @@
           <template slot-scope="scope">
             <i class="el-icon-place"></i>
             <el-link :underline="false">
-              <span style="margin-left: 10px" v-if="scope.row.login!==null"
+              <span style="margin-left: 10px" v-if="!(typeof(scope.row.login) == 'undefined') && scope.row.login!==null"
                     @click="showIPInfo(scope.row.login===null?'':scope.row.login.ip)">{{ scope.row.login.ip }}</span>
             </el-link>
 
-            <span style="margin-left: 10px" v-if="scope.row.login===null"
+            <span style="margin-left: 10px" v-if="(typeof(scope.row.login) == 'undefined') ||scope.row.login===null"
                   @click="showIPInfo(scope.row.login===null?'':scope.row.login.ip)">暂无记录</span>
 
           </template>

@@ -3,7 +3,7 @@
     <div class="line"></div>
     <p id="txt">
       <el-link :underline="false" type="info">© 2019 博客客客客&nbsp;&nbsp;</el-link>
-      <el-link :underline="false" target="_blank" href="http://www.beian.miit.gov.cn/" type="info">赣ICP备888888号-1</el-link>
+      <el-link :underline="false" target="_blank" href="http://www.beian.miit.gov.cn/" type="info">赣ICP备19010199号-1</el-link>
     </p>
 
     <p class="sdfsdf">

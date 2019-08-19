@@ -64,13 +64,16 @@
 
           </p>
           <!-- 评论下的回复部分 -->
-          <p v-if="discuss.replyList.length>0" v-for="reply in discuss.replyList" style="margin: -5px"
+          <p v-if="!(typeof(discuss.replyList) == 'undefined') && discuss.replyList.length>0"
+             v-for="reply in discuss.replyList" style="margin: -5px"
              @mouseenter="pEnter()" @mouseleave="pLeave()">
             <span style="margin-left: 5%" class="el-icon-arrow-right"></span>
             <el-button type="text">{{reply.user.name}}&nbsp;&nbsp;:</el-button>
 
             <span v-if="reply.reply !== null">回复:</span>
-            <el-button type="text" v-if="reply.reply !== null">{{reply.reply.user.name}}</el-button>
+            <el-button type="text" v-if="!(typeof(reply.reply) == 'undefined') && reply.reply !== null">
+              {{reply.reply.user.name}}
+            </el-button>
 
             <span style="margin-left: 10px">{{reply.body}}</span>
             <span style="color: #909399;margin-left: 50px" class="el-icon-time">{{getTime(reply.time)}}</span>
@@ -284,6 +287,7 @@
                 type: 'success',
                 message: '删除成功'
               });
+              this.loadBlog();
             })
           } else {
             //普通用户
@@ -292,10 +296,11 @@
                 type: 'success',
                 message: '删除成功'
               });
+              this.loadBlog();
             })
           }
 
-          this.loadBlog();
+
         }).catch(() => {
         });
       }
