@@ -19,6 +19,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -63,22 +64,17 @@ public class UserController {
         if (!formatUtil.checkStringNull(user.getName(), user.getPassword())) {
             return Result.create(StatusCode.ERROR, "参数错误");
         }
-        User dbUser = userService.findUserByName(user.getName());
-        if (null == dbUser) {
-            return Result.create(StatusCode.ERROR, "用户名或密码错误");
-        }
-        if (0 == dbUser.getState()) {
-            return Result.create(StatusCode.ERROR, "你已被封禁");
-        }
 
-        Map map = userService.login(user);
-        if (map != null) {
-            //登录成功更新登录表
+        try {
+            Map map = userService.login(user);
             loginService.saveLoginInfo(user);
             return Result.create(StatusCode.OK, "登录成功", map);
-        } else {
+        } catch (UsernameNotFoundException unfe) {
             return Result.create(StatusCode.LOGINERROR, "登录失败，用户名或密码错误");
+        } catch (RuntimeException re) {
+            return Result.create(StatusCode.LOGINERROR, re.getMessage());
         }
+
     }
 
 

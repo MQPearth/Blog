@@ -7,6 +7,8 @@ import com.zzx.config.RabbitMQConfig;
 import com.zzx.dao.CodeDao;
 import com.zzx.dao.RoleDao;
 import com.zzx.dao.UserDao;
+import com.zzx.model.entity.Result;
+import com.zzx.model.entity.StatusCode;
 import com.zzx.model.pojo.Code;
 import com.zzx.model.pojo.Role;
 import com.zzx.model.pojo.User;
@@ -88,34 +90,40 @@ public class UserService implements UserDetailsService {
      * @param user
      * @return
      */
-    public Map login(User user) {
+    public Map login(User user) throws UsernameNotFoundException, RuntimeException {
+
+        User dbUser = this.findUserByName(user.getName());
+        //此用户不存在 或 密码错误
+        if (null == dbUser || !encoder.matches(user.getPassword(), dbUser.getPassword())) {
+            throw new UsernameNotFoundException("用户名或密码错误");
+        }
+        //用户已被封禁
+        if (0 == dbUser.getState()) {
+            throw new RuntimeException("你已被封禁");
+        }
+
+        //用户名 密码 匹配 签发token
+        final UserDetails userDetails = this.loadUserByUsername(user.getName());
+
+        final String token = jwtTokenUtil.generateToken(userDetails);
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+        List<String> roles = new ArrayList<>();
+        for (GrantedAuthority authority : authorities) {
+            roles.add(authority.getAuthority());
+        }
+
         Map<String, Object> map = new HashMap<>(3);
 
-        try {
+        map.put("token", jwtConfig.getPrefix() + token);
+        map.put("name", user.getName());
+        map.put("roles", roles);
 
-            final UserDetails userDetails = this.loadUserByUsername(user.getName());
+        //将token存入redis 过期时间 jwtConfig.time 单位[s]
+        redisTemplate.opsForValue().
+                set(JwtConfig.REDIS_TOKEN_KEY_PREFIX + user.getName(), jwtConfig.getPrefix() + token, jwtConfig.getTime(), TimeUnit.SECONDS);
 
-            final String token = jwtTokenUtil.generateToken(userDetails);
-            Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-            List<String> roles = new ArrayList<>();
-            for (GrantedAuthority authority : authorities) {
-                roles.add(authority.getAuthority());
-            }
+        return map;
 
-            map.put("token", jwtConfig.getPrefix() + token);
-            map.put("name", user.getName());
-            map.put("roles", roles);
-
-            //将token存入redis 过期时间 jwtconfig.time 单位[s]
-            redisTemplate.opsForValue().
-                    set(JwtConfig.REDIS_TOKEN_KEY_PREFIX + user.getName(), jwtConfig.getPrefix() + token, jwtConfig.getTime(), TimeUnit.SECONDS);
-
-            return map;
-        } catch (AuthenticationException e) {
-            //认证失败，不返回token
-            return null;
-
-        }
 
     }
 
@@ -126,9 +134,6 @@ public class UserService implements UserDetailsService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void register(User userToAdd, String mailCode, String inviteCode) throws RuntimeException {
-
-
-        String redisMailCode = this.getMailCodeFromRedis(userToAdd.getMail());
 
 
         //验证码无效 throw 异常
@@ -175,34 +180,22 @@ public class UserService implements UserDetailsService {
 
 
     /**
-     * 根据用户名查询用户及用户角色
+     * 根据用户名查询用户
      *
      * @param name
      * @return
      * @throws UsernameNotFoundException
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
         User user = userDao.findUserByName(name);
-        //查询不到用户时，判定这是个非法token，但是仍然返回 不抛异常
-        if (user == null) {
-            return new org.springframework.security.core.userdetails.User("NORMAL", "NORMAL", null);
-        }
-
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>(1);
         //用于添加用户的权限。将用户权限添加到authorities
-        if ((user.getState() == 1)) {
-            List<Role> roles = roleDao.findUserRoles(user.getId());
-            for (Role role : roles) {
-                authorities.add(new SimpleGrantedAuthority(role.getName()));
-            }
-        } else {  //该用户被封禁
-            authorities.add(new SimpleGrantedAuthority("NORMAL"));
+        List<Role> roles = roleDao.findUserRoles(user.getId());
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
-
         return new org.springframework.security.core.userdetails.User(user.getName(), "***********", authorities);
-
     }
 
     /**
@@ -252,9 +245,10 @@ public class UserService implements UserDetailsService {
 
         User userById = userDao.findUserById(id);
 
-        //从redis中移除token
-        redisTemplate.delete(JwtConfig.REDIS_TOKEN_KEY_PREFIX + userById.getName());
-
+        //封禁 从redis中移除token
+        if (0 == state) {
+            redisTemplate.delete(JwtConfig.REDIS_TOKEN_KEY_PREFIX + userById.getName());
+        }
     }
 
 

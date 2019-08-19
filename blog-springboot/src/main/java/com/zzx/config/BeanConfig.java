@@ -37,7 +37,7 @@ public class BeanConfig {
     @Bean
     public ObjectMapper objectMapper() {
 
-        return new ObjectMapper();
+        return new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
 

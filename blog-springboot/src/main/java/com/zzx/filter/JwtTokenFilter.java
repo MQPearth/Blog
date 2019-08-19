@@ -68,11 +68,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             } else {
                 giveFlag = true;
             }
-        } else //token校验失败
-        {
+        } else {
+            //token校验失败
             giveFlag = true;
         }
-
 
         if (giveFlag) {
             //token因某原因校验失败,给定游客身份->[游客]角色未写入数据库角色表

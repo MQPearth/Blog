@@ -49,7 +49,7 @@
     <select id="findNewDiscuss" parameterType="Integer" resultMap="Discuss">
         SELECT discuss_id,discuss_body,discuss_time,b.blog_id ,b.blog_title,u.user_id,u.user_name
         FROM discuss d LEFT JOIN blog b on d.blog_id = b.blog_id LEFT JOIN user u on d.user_id = u.user_id
-        ORDER BY d.discuss_time
+        ORDER BY d.discuss_time DESC
         LIMIT 0, #{value}
     </select>
 
