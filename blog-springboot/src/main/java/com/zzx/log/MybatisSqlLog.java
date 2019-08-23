@@ -53,22 +53,17 @@ public class MybatisSqlLog implements Interceptor {
         }
         BoundSql boundSql = mappedStatement.getBoundSql(parameter); // BoundSql就是封装myBatis最终产生的sql类
         Configuration configuration = mappedStatement.getConfiguration(); // 获取节点的配置
-        String sql = getSql(configuration, boundSql); // 获取到最终的sql语句
+        String sql = showSql(configuration, boundSql); // 获取到最终的sql语句
 
         //sql执行耗时100ms以上时警告
         if (time > 100) {
-            String info = String.format("{SQL:[%s],Time:[%sms]}", sql, time);
-            logger.warn(info);
+            StringBuilder builder = new StringBuilder();
+            builder.append("{SQL:[").append(sql).append("],")
+                    .append("Time:[").append(time).append("ms]}");
+            logger.warn(builder.toString());
         }
         // 执行完上面的任务后，不改变原有的sql执行过程
         return proceed;
-    }
-
-    // 封装了一下sql语句，使得结果返回完整xml路径下的sql语句节点id + sql语句
-    public static String getSql(Configuration configuration, BoundSql boundSql) {
-        String sql = showSql(configuration, boundSql);
-
-        return sql;
     }
 
     // 如果参数是String，则添加单引号， 如果是日期，则转换为时间格式器并加单引号； 对参数是null和不是null的情况作了处理

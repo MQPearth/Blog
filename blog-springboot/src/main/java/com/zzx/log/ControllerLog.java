@@ -47,11 +47,15 @@ public class ControllerLog {
         long end = System.currentTimeMillis();
 
 
-        String format =
-                String.format
-                        ("{URL:[%s],RequestMethod:[%s],Args:%s,ReturnValue:[%s],Time:[%sms],MethodName:[%s]}",
-                                request.getRequestURI(), request.getMethod(), Arrays.toString(pjp.getArgs()), obj == null ? "null" : obj.toString(), end - start, pjp.getSignature());
-        logger.info(format);
+        StringBuilder builder = new StringBuilder();
+        builder.append("{URL:[").append(request.getRequestURI()).append("],")
+                .append("RequestMethod:[").append(request.getMethod()).append("],")
+                .append("Args:").append(Arrays.toString(pjp.getArgs())).append(",")
+                .append("ReturnValue:[").append(obj == null ? "null" : obj.toString()).append("],")
+                .append("Time:[").append(end - start).append("ms],")
+                .append("MethodName:[").append(pjp.getSignature()).append("]}");
+
+        logger.info(builder.toString());
         return obj;
 
     }
