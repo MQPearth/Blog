@@ -2,7 +2,7 @@ package com.zzx.mq;
 
 
 import com.zzx.config.MailConfig;
-import com.zzx.config.RabbitMQConfig;
+import com.zzx.config.RabbitMqConfig;
 import com.zzx.model.entity.MailMessage;
 import com.zzx.utils.DateUtil;
 import com.zzx.utils.LoggerUtil;
@@ -18,15 +18,17 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+
+/**
+ * 发送邮件的队列消费者
+ */
 @Component
-@RabbitListener(queues = RabbitMQConfig.MAIL_QUEUE)
+@RabbitListener(queues = RabbitMqConfig.MAIL_QUEUE)
 public class MailListener {
 
     private Logger logger = LoggerUtil.loggerFactory(this.getClass());
 
 
-    @Autowired
-    private DateUtil dateUtil;
 
     @Autowired
     private JavaMailSender mailSender;

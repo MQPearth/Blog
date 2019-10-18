@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/discuss")
 public class DiscussController {
+
     @Autowired
     private DiscussService discussService;
 
     @Autowired
     private FormatUtil formatUtil;
+
 
 
     @ApiOperation(value = "发布评论", notes = "评论内容+博文id")

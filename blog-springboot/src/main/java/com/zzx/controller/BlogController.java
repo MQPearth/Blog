@@ -1,5 +1,7 @@
 package com.zzx.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.zzx.config.RedisConfig;
 import com.zzx.model.entity.PageResult;
 import com.zzx.model.entity.Result;
 import com.zzx.model.entity.StatusCode;
@@ -71,22 +73,27 @@ public class BlogController {
         if (!formatUtil.checkStringNull(blogTitle, blogBody) || !formatUtil.checkPositive(tagId)) {
             return Result.create(StatusCode.ERROR, "参数错误");
         }
-
-        blogService.saveBlog(blogTitle, blogBody, tagId);
-        return Result.create(StatusCode.OK, "发布成功");
+        try {
+            blogService.saveBlog(blogTitle, blogBody, tagId);
+            return Result.create(StatusCode.OK, "发布成功");
+        } catch (IOException e) {
+            return Result.create(StatusCode.ERROR, "非法操作");
+        }
     }
 
 
     @ApiOperation(value = "根据id查询博文", notes = "博文id")
     @GetMapping("/{blogId}/{isHistory}")
     public Result findBlogById(@PathVariable Integer blogId, @PathVariable boolean isHistory) {
-        if (!formatUtil.checkObjectNull(blogId)) {
+        if (!formatUtil.checkObjectNull(blogId, isHistory)) {
             return Result.create(StatusCode.ERROR, "参数错误");
         }
         try {
             return Result.create(StatusCode.OK, "查询成功", blogService.findBlogById(blogId, isHistory));
         } catch (RuntimeException e) {
             return Result.create(StatusCode.NOTFOUND, "此博客不存在");
+        } catch (IOException e) {
+            return Result.create(StatusCode.ERROR, "此博客不存在");
         }
 
     }
@@ -125,15 +132,20 @@ public class BlogController {
     @ApiOperation(value = "首页分页查询博文", notes = "页数+显示数量")
     @GetMapping("/home/{page}/{showCount}")
     public Result homeBlog(@PathVariable Integer page, @PathVariable Integer showCount) {
-        if (!formatUtil.checkPositive(page, showCount) || showCount > BlogService.REDIS_NEW_BLOG_COUNT) {
+        if (!formatUtil.checkPositive(page, showCount) || showCount > RedisConfig.REDIS_NEW_BLOG_COUNT) {
             return Result.create(StatusCode.OK, "参数错误");
         }
 
 
-        PageResult<Blog> pageResult =
-                new PageResult<>(blogService.getHomeBlogCount(), blogService.findHomeBlog(page, showCount));
+        try {
+            PageResult<Blog> pageResult = new PageResult<>(blogService.getHomeBlogCount(), blogService.findHomeBlog(page, showCount));
+            return Result.create(StatusCode.OK, "查询成功", pageResult);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Result.create(StatusCode.SERVICEERROR, "服务异常");
+        }
 
-        return Result.create(StatusCode.OK, "查询成功", pageResult);
+
     }
 
     /**
@@ -145,7 +157,12 @@ public class BlogController {
     @ApiOperation(value = "首页热门博文", notes = "首页热门博文")
     @GetMapping("/hotBlog")
     public Result hotBlog() {
-        return Result.create(StatusCode.OK, "查询成功", blogService.findHotBlog());
+
+        try {
+            return Result.create(StatusCode.OK, "查询成功", blogService.findHotBlog());
+        } catch (IOException e) {
+            return Result.create(StatusCode.SERVICEERROR, "服务异常");
+        }
     }
 
 
@@ -163,9 +180,10 @@ public class BlogController {
     public Result searchBlog(String search,
                              @PathVariable Integer page,
                              @PathVariable Integer showCount) {
-        if (!formatUtil.checkPositive(page, showCount)) {
+        if (!formatUtil.checkPositive(page, showCount) || showCount > RedisConfig.REDIS_NEW_BLOG_COUNT) {
             return Result.create(StatusCode.OK, "参数错误");
         }
+
         if (!formatUtil.checkStringNull(search)) {
             return Result.create(StatusCode.OK, "参数错误");
         }
@@ -211,6 +229,8 @@ public class BlogController {
             return Result.create(StatusCode.OK, "修改成功");
         } catch (RuntimeException e) {
             return Result.create(StatusCode.ERROR, "修改失败" + e.getMessage());
+        } catch (JsonProcessingException e) {
+            return Result.create(StatusCode.SERVICEERROR, "服务异常");
         }
     }
 
@@ -228,33 +248,21 @@ public class BlogController {
             return Result.create(StatusCode.OK, "删除成功");
         } catch (RuntimeException e) {
             return Result.create(StatusCode.ERROR, "删除失败" + e.getMessage());
+        } catch (JsonProcessingException e) {
+            return Result.create(StatusCode.SERVICEERROR, "服务异常");
         }
     }
 
     @ApiOperation(value = "管理员删除博文", notes = "博文id")
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/admin/{blogId}")
-    public Result adminDeleteBlog(@PathVariable Integer blogId) {
+    public Result adminDeleteBlog(@PathVariable Integer blogId) throws JsonProcessingException {
         if (!formatUtil.checkPositive(blogId)) {
             return Result.create(StatusCode.ERROR, "参数错误");
         }
         blogService.adminDeleteBlog(blogId);
         return Result.create(StatusCode.OK, "删除成功");
     }
-
-
-    //存在业务冲突，弃用此方法
-//    @ApiOperation(value = "管理员撤销删除博文", notes = "博文id")
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @PutMapping("/undoDelete/{blogId}")
-//    public Result undoDelete(@PathVariable Integer blogId) {
-//
-//        if (!formatUtil.checkPositive(blogId))
-//            return Result.create(StatusCode.ERROR, "参数错误");
-//
-//        blogService.undoDelete(blogId);
-//        return Result.create(StatusCode.OK, "撤销删除成功");
-//    }
 
 
     @ApiOperation(value = "管理员分页搜索博文", notes = "搜索内容+页码+显示条数")
@@ -282,7 +290,11 @@ public class BlogController {
     @ApiOperation(value = "按月份归档博客", notes = "按月份归档博客")
     @GetMapping("/statisticalBlogByMonth")
     public Result statisticalBlogByMonth() {
-        return Result.create(StatusCode.OK, "查询成功", blogService.statisticalBlogByMonth());
+        try {
+            return Result.create(StatusCode.OK, "查询成功", blogService.statisticalBlogByMonth());
+        } catch (IOException e) {
+            return Result.create(StatusCode.SERVICEERROR, "服务异常");
+        }
     }
 
 

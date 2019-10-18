@@ -14,9 +14,7 @@
         <result property="state" column="user_state"/>
         <result property="login.ip" column="login_ip"/>
         <result property="login.time" column="login_time"/>
-
     </resultMap>
-
 
     <select id="findUserByName" parameterType="String" resultMap="User">
         SELECT user_id , user_name,user_password,user_mail,user_state,user_reward
@@ -35,23 +33,6 @@
         INSERT INTO user VALUES (null,#{name},#{password},#{mail},#{state},#{reward})
     </insert>
 
-    <update id="updateUserState" parameterType="User">
-        update user
-        set user_state = #{state}
-        WHERE user_id = #{id}
-    </update>
-
-    <update id="updateUserPasswordById" parameterType="User">
-        UPDATE user
-        SET user_password = #{password}
-        WHERE user_id = #{id}
-    </update>
-
-    <update id="updateUserMailById" parameterType="User">
-        UPDATE user
-        SET user_mail = #{mail}
-        WHERE user_id = #{id}
-    </update>
 
     <select id="findUserById" parameterType="Integer" resultMap="User">
         SELECT user_id , user_name,user_password,user_mail,user_state
@@ -84,9 +65,25 @@
         WHERE user_name LIKE '%${value}%'
     </select>
 
-    <update id="updateUserRewardById" parameterType="User">
+    <update id="updateUser" parameterType="User">
         UPDATE user
-        SET user_reward = #{reward}
+        <set>
+            <if test="name!=null">
+                user_name = #{name},
+            </if>
+            <if test="password!=null">
+                user_password = #{password},
+            </if>
+            <if test="mail!=null">
+                user_mail = #{mail},
+            </if>
+            <if test="state!=null">
+                user_state = #{state},
+            </if>
+            <if test="reward!=null">
+                user_reward = #{reward},
+            </if>
+        </set>
         WHERE user_id = #{id}
     </update>
 

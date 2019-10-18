@@ -4,11 +4,15 @@ package com.zzx.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.zzx.config.JwtConfig;
+import com.zzx.config.RedisConfig;
+import com.zzx.controller.ErrorController;
 import com.zzx.model.entity.Result;
 import com.zzx.model.entity.StatusCode;
 import com.zzx.service.UserService;
 import com.zzx.utils.JwtTokenUtil;
+import com.zzx.utils.RequestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
@@ -32,6 +36,7 @@ import java.util.ArrayList;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
@@ -40,7 +45,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private UserService userService;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private RequestUtil requestUtil;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
 
     @Autowired
     private JwtConfig jwtConfig;
@@ -48,16 +57,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
 
+        limitRequestFrequency(request, response);
+
+
         boolean giveFlag = false;
         String authHeader = request.getHeader(jwtConfig.getHeader());
 
         if (authHeader != null && authHeader.startsWith(jwtConfig.getPrefix())) {
-//            final String authToken = authHeader.substring(jwtConfig.getPrefix().length());//除去前缀，获取token
             UserDetails userDetails = userService.loadUserByToken(authHeader);
 
             if (null != userDetails) {
-
-                if (SecurityContextHolder.getContext().getAuthentication() == null) {  //此请求是否校验过
+                //此请求是否校验过
+                if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -78,13 +89,44 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             // 省去每个方法上的permitAll注解
             List<SimpleGrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority("NORMAL"));
-            User user = new User("NORMAL", "NORMAL", authorities);//假定身份
+            //假定身份
+            User user = new User("NORMAL", "NORMAL", authorities);
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);//赋予权限
+            //赋予权限
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         chain.doFilter(request, response);
+    }
+
+    /**
+     * 校验请求是否过于频繁
+     *
+     * @param request
+     */
+    private void limitRequestFrequency(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String ipAddress = requestUtil.getIpAddress(request);
+        String url = request.getRequestURI();
+        String redisKey = ipAddress + RedisConfig.REDIS_MIDDLE_CHAR + url;
+        //缓存时间 2s
+        long timing = 2000L;
+        // 127.0.0.1_/blog/hotBlog
+        if (redisTemplate.hasKey(redisKey)) {
+            String value = redisTemplate.opsForValue().get(redisKey);
+            Integer count = Integer.parseInt(value);
+            if (count > 2) {
+                //请求频繁
+                request.getRequestDispatcher(ErrorController.FREQUENT_OPERATION).forward(request, response);
+            } else {
+                count++;
+                redisTemplate.opsForValue().set(redisKey, count.toString(), timing, TimeUnit.MILLISECONDS);
+            }
+        } else {
+
+            redisTemplate.opsForValue().set(redisKey, "1", timing, TimeUnit.MILLISECONDS);
+        }
     }
 }
 

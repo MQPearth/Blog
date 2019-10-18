@@ -68,7 +68,7 @@ public class ReplyService {
         //更新博文评论数
         Blog blog = blogDao.findBlogById(discuss.getBlog().getId());
         blog.setDiscussCount(blog.getDiscussCount() + 1);
-        blogDao.updateBlogDiscussCount(blog);
+        blogDao.updateBlog(blog);
 
     }
 
@@ -95,7 +95,7 @@ public class ReplyService {
         //更新博文评论数
         Blog blog = blogDao.findBlogById(discuss.getBlog().getId());
         blog.setDiscussCount(blog.getDiscussCount() - 1);
-        blogDao.updateBlogDiscussCount(blog);
+        blogDao.updateBlog(blog);
 
     }
 
@@ -116,6 +116,6 @@ public class ReplyService {
         //更新博文评论数
         Blog blog = blogDao.findBlogById(discuss.getBlog().getId());
         blog.setDiscussCount(blog.getDiscussCount() - 1);
-        blogDao.updateBlogDiscussCount(blog);
+        blogDao.updateBlog(blog);
     }
 }

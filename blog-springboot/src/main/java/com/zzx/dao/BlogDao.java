@@ -98,22 +98,6 @@ public interface BlogDao {
      */
     List<Blog> findAllblog(@Param("start") Integer start, @Param("showCount") Integer showCount);
 
-    /**
-     * 修改博文
-     *
-     * @param blog
-     */
-    void updateBlog(Blog blog);
-
-
-    /**
-     * 更改博客状态
-     *
-     * @param blogId
-     * @param blogState
-     */
-    void updateBlogState(@Param("blogId") Integer blogId, @Param("blogState") Integer blogState);
-
 
     /**
      * 符合关键词的博文数量
@@ -153,22 +137,10 @@ public interface BlogDao {
      */
     List<Map> statisticalBlogByMonth(Integer count);
 
-    /**
-     * 更新博文评论数
-     *
-     * @param blog
-     */
-    void updateBlogDiscussCount(Blog blog);
-
-    /**
-     * 更新博文浏览数
-     *
-     * @param blog
-     */
-    void updateBlogViews(Blog blog);
 
     /**
      * 查询此标签下是否有博客
+     *
      * @param tagId
      * @return
      */
@@ -177,7 +149,16 @@ public interface BlogDao {
     /**
      * 查询博客记录数
      * 所有状态
+     *
      * @return
      */
     Long getAllBlogCount();
+
+
+    /**
+     * 根据博客id更新博客
+     *
+     * @param blog
+     */
+    void updateBlog(Blog blog);
 }

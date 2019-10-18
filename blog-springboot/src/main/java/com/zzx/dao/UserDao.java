@@ -27,12 +27,7 @@ public interface UserDao {
     void saveUser(User user);
 
 
-    /**
-     * 封禁或解禁用户
-     *
-     * @param user
-     */
-    void updateUserState(User user);
+
 
 
     /**
@@ -44,21 +39,8 @@ public interface UserDao {
     User findUserByMail(String mail);
 
 
-    /**
-     * 根据用户id 更新密码
-     * 需要id，password字段
-     *
-     * @param user
-     */
-    void updateUserPasswordById(User user);
 
-    /**
-     * 根据用户id更新邮箱
-     * 需要id ,mail 两字段
-     *
-     * @param user
-     */
-    void updateUserMailById(User user);
+
 
     /**
      * 根据id查询用户
@@ -102,9 +84,8 @@ public interface UserDao {
     Long getUserCountByName(String userName);
 
     /**
-     * 更新用户打赏码
-     *
+     * 根据id 修改用户信息
      * @param user
      */
-    void updateUserRewardById(User user);
+    void updateUser(User user);
 }

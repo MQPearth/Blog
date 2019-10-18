@@ -3,7 +3,7 @@ package com.zzx.service;
 
 import com.zzx.config.JwtConfig;
 import com.zzx.config.MailConfig;
-import com.zzx.config.RabbitMQConfig;
+import com.zzx.config.RabbitMqConfig;
 import com.zzx.dao.CodeDao;
 import com.zzx.dao.RoleDao;
 import com.zzx.dao.UserDao;
@@ -241,7 +241,8 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setId(id);
         user.setState(state);
-        userDao.updateUserState(user); //更改用户状态
+        //更改用户状态
+        userDao.updateUser(user);
 
         User userById = userDao.findUserById(id);
 
@@ -302,7 +303,7 @@ public class UserService implements UserDetailsService {
         }
         //更新密码
         user.setPassword(encoder.encode(newPassword));
-        userDao.updateUserPasswordById(user);
+        userDao.updateUser(user);
 
     }
 
@@ -339,7 +340,7 @@ public class UserService implements UserDetailsService {
 
         user.setMail(newMail);
         //更新用户邮箱信息
-        userDao.updateUserMailById(user);
+        userDao.updateUser(user);
 
     }
 
@@ -364,7 +365,7 @@ public class UserService implements UserDetailsService {
         }
         user.setPassword(encoder.encode(newPassword));
         //更新密码
-        userDao.updateUserPasswordById(user);
+        userDao.updateUser(user);
 
     }
 
@@ -437,7 +438,7 @@ public class UserService implements UserDetailsService {
         redisTemplate.opsForValue()
                 .set(MailConfig.REDIS_MAIL_KEY_PREFIX + mail, code, MailConfig.EXPIRED_TIME, TimeUnit.MINUTES);
 
-        rabbitTemplate.convertAndSend(RabbitMQConfig.MAIL_QUEUE, map);
+        rabbitTemplate.convertAndSend(RabbitMqConfig.MAIL_QUEUE, map);
 
     }
 
@@ -492,7 +493,7 @@ public class UserService implements UserDetailsService {
     public void updateUserReward(String imgPath) {
         User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
         user.setReward(imgPath);
-        userDao.updateUserRewardById(user);
+        userDao.updateUser(user);
     }
 
     /**

@@ -61,7 +61,7 @@ public class DiscussService {
 
         //评论数加一
         blog.setDiscussCount(blog.getDiscussCount() + 1);
-        blogDao.updateBlogDiscussCount(blog);
+        blogDao.updateBlog(blog);
     }
 
     /**
@@ -90,7 +90,7 @@ public class DiscussService {
 
         Blog blog = blogDao.findBlogById(discuss.getBlog().getId());
         blog.setDiscussCount(blog.getDiscussCount() - 1 - rows);
-        blogDao.updateBlogDiscussCount(blog);
+        blogDao.updateBlog(blog);
     }
 
     /**
@@ -110,7 +110,7 @@ public class DiscussService {
 
         Blog blog = blogDao.findBlogById(discuss.getBlog().getId());
         blog.setDiscussCount(blog.getDiscussCount() - 1 - rows);
-        blogDao.updateBlogDiscussCount(blog);
+        blogDao.updateBlog(blog);
     }
 
     /**

@@ -34,6 +34,7 @@ import java.util.regex.Matcher;
                 Object.class, RowBounds.class, ResultHandler.class})})
 @Component
 public class MybatisSqlLog implements Interceptor {
+
     private Logger logger = LoggerUtil.loggerFactory(this.getClass());
 
     @Override
@@ -51,17 +52,20 @@ public class MybatisSqlLog implements Interceptor {
         if (invocation.getArgs().length > 1) {
             parameter = invocation.getArgs()[1];
         }
-        BoundSql boundSql = mappedStatement.getBoundSql(parameter); // BoundSql就是封装myBatis最终产生的sql类
-        Configuration configuration = mappedStatement.getConfiguration(); // 获取节点的配置
-        String sql = showSql(configuration, boundSql); // 获取到最终的sql语句
+        // BoundSql就是封装myBatis最终产生的sql类
+        BoundSql boundSql = mappedStatement.getBoundSql(parameter);
+        // 获取节点的配置
+        Configuration configuration = mappedStatement.getConfiguration();
+        // 获取到最终的sql语句
+        String sql = showSql(configuration, boundSql);
 
         //sql执行耗时100ms以上时警告
-        if (time > 100) {
+//        if (time > 100) {
             StringBuilder builder = new StringBuilder();
             builder.append("{SQL:[").append(sql).append("],")
                     .append("Time:[").append(time).append("ms]}");
             logger.warn(builder.toString());
-        }
+//        }
         // 执行完上面的任务后，不改变原有的sql执行过程
         return proceed;
     }

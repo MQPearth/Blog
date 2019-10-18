@@ -48,18 +48,18 @@ public class BeanConfig {
      */
     @Bean
     public Queue sendSmsQueue() {
-        return new Queue(RabbitMQConfig.MAIL_QUEUE);
+        return new Queue(RabbitMqConfig.MAIL_QUEUE);
     }
 
-//    /**
-//     * 新建一个用于更新博客的消息队列
-//     *
-//     * @return
-//     */
-//    @Bean
-//    public Queue updateBlogQueue() {
-//        return new Queue(RabbitMQConfig.BLOG_QUEUE);
-//    }
+    /**
+     * 新建一个用于更新博客的消息队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue updateBlogQueue() {
+        return new Queue(RabbitMqConfig.BLOG_QUEUE);
+    }
 
 
 }

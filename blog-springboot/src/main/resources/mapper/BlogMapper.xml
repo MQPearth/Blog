@@ -55,7 +55,7 @@
     </select>
 
     <select id="findHomeBlog" resultMap="Blog">
-        SELECT blog_id,blog_title,LEFT (blog_body,150) AS blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        SELECT blog_id,blog_title, blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
         WHERE b.blog_state = 1
         ORDER BY blog_time DESC
@@ -63,8 +63,8 @@
     </select>
 
     <select id="findHotBlog" parameterType="Integer" resultMap="Blog">
-        SELECT blog_id,blog_title,LEFT (blog_body,150) AS blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state
-        FROM blog
+        SELECT blog_id,blog_title, blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        FROM blog b LEFT JOIN user u on b.user_id = u.user_id
         WHERE blog_state = 1
         ORDER BY blog_blogViews DESC,blog_discussCount DESC
         LIMIT 0,#{value}
@@ -99,17 +99,35 @@
 
     <update id="updateBlog" parameterType="Blog">
         UPDATE blog
-        SET blog_title = #{title},
-            blog_body = #{body}
+        <set>
+            <if test="title!=null">
+                blog_title = #{title},
+            </if>
+
+            <if test="body!=null">
+                blog_body = #{body},
+            </if>
+
+            <if test="discussCount!=null">
+                blog_discussCount = #{discussCount},
+            </if>
+
+            <if test="blogViews!=null">
+                blog_blogViews = #{blogViews},
+            </if>
+
+            <if test="time!=null">
+                blog_time = #{time},
+            </if>
+
+            <if test="state!=null">
+                blog_state = #{state},
+            </if>
+
+        </set>
         WHERE blog_id = #{id}
     </update>
 
-
-    <update id="updateBlogState">
-        UPDATE blog
-        SET blog_state = #{blogState}
-        WHERE blog_id = #{blogId}
-    </update>
 
     <select id="getSearchAllBlogCount" parameterType="String" resultType="Long">
         SELECT COUNT(1)
@@ -131,18 +149,8 @@
         ORDER by blog_time DESC
         LIMIT 0,#{value}
     </select>
-    
-    <update id="updateBlogDiscussCount" parameterType="Blog">
-        UPDATE blog
-        SET blog_discussCount = #{discussCount}
-        WHERE blog_id = #{id}
-    </update>
 
-    <update id="updateBlogViews" parameterType="Blog">
-        UPDATE blog
-        SET blog_blogViews = #{blogViews}
-        WHERE blog_id = #{id}
-    </update>
+
 
     <select id="findBlogCountByTagId" parameterType="Integer" resultType="Integer">
         SELECT COUNT(1) from blog_tag bt LEFT JOIN blog b on bt.blog_id = b.blog_id
