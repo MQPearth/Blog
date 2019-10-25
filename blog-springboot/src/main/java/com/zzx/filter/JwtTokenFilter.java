@@ -47,6 +47,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Autowired
     private RequestUtil requestUtil;
 
+    /**
+     * 范围时间内限制最大请求次数
+     */
+    private static final int LIMIT_REQUEST_FREQUENCY_COUNT = 8;
+
+
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
@@ -108,24 +114,22 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private void limitRequestFrequency(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String ipAddress = requestUtil.getIpAddress(request);
-        String url = request.getRequestURI();
-        String redisKey = ipAddress + RedisConfig.REDIS_MIDDLE_CHAR + url;
+        String redisKey = RedisConfig.REDIS_IP_PREFIX + ipAddress;
         //缓存时间 2s
-        long timing = 2000L;
         // 127.0.0.1_/blog/hotBlog
         if (redisTemplate.hasKey(redisKey)) {
             String value = redisTemplate.opsForValue().get(redisKey);
             Integer count = Integer.parseInt(value);
-            if (count > 2) {
+            if (count > JwtTokenFilter.LIMIT_REQUEST_FREQUENCY_COUNT) {
                 //请求频繁
                 request.getRequestDispatcher(ErrorController.FREQUENT_OPERATION).forward(request, response);
             } else {
                 count++;
-                redisTemplate.opsForValue().set(redisKey, count.toString(), timing, TimeUnit.MILLISECONDS);
+                redisTemplate.opsForValue().set(redisKey, count.toString(), RedisConfig.REDIS_LIMIT_REQUEST_FREQUENCY_TIME, TimeUnit.MILLISECONDS);
             }
-        } else {
 
-            redisTemplate.opsForValue().set(redisKey, "1", timing, TimeUnit.MILLISECONDS);
+        } else {
+            redisTemplate.opsForValue().set(redisKey, "1", RedisConfig.REDIS_LIMIT_REQUEST_FREQUENCY_TIME, TimeUnit.MILLISECONDS);
         }
     }
 }

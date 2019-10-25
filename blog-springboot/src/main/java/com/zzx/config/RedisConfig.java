@@ -40,8 +40,13 @@ public class RedisConfig {
     public static final String REDIS_STATISTICAL = "STATISTICAL";
 
     /**
-     *
-     * 127.0.0.1_/blog/hotBlog
+     * IP_127.0.0.1
      */
-    public static final String REDIS_MIDDLE_CHAR = "_";
+    public static final String REDIS_IP_PREFIX = "IP_";
+
+
+    /**
+     * 请求频率限制 缓存时间
+     */
+    public static final long REDIS_LIMIT_REQUEST_FREQUENCY_TIME = 1000L;
 }
