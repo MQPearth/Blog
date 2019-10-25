@@ -11,7 +11,7 @@ module.exports = {
     proxyTable: {// 在这里配置如下代码 此配置只在npm run dev 下生效
 
       '/api/ip':{   //外部接口
-        target: 'https://tool.lu/ip/ajax.html', //
+        target: 'https://tool.lu/****', //自己找接口，最近严查
         changeOrigin: true, //
         pathRewrite: {
           // 路径重写
