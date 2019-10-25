@@ -31,7 +31,7 @@
       <!-- 以下是预览模式配置 -->
       <!--:toolbarsFlag="false"  :subfield="false" defaultOpen="preview"-->
 
-      <div style="margin: 0 auto;width: 20%" class="hidden-xs-only" v-if="userReward!==null">
+      <div style="margin: 0 auto;width: 20%" class="hidden-xs-only" v-if="userReward!=undefined&&userReward!==null">
         <br/>
         <el-popover placement="bottom" width="250px" height="250px" trigger="hover">
           <img alt="打赏码" :src="userReward" width="250px" height="250px"/>

@@ -333,7 +333,7 @@ public class UserService implements UserDetailsService {
 
 
         //校验新邮箱验证码
-        if (!checkMailCode(newMailCode, newMail)) {
+        if (!checkMailCode(newMail, newMailCode)) {
             throw new RuntimeException("新邮箱无效验证码");
         }
 
