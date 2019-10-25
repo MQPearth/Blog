@@ -60,17 +60,21 @@ public class MybatisSqlLog implements Interceptor {
         String sql = showSql(configuration, boundSql);
 
         //sql执行耗时100ms以上时警告
-//        if (time > 100) {
+        if (time > 100) {
             StringBuilder builder = new StringBuilder();
             builder.append("{SQL:[").append(sql).append("],")
                     .append("Time:[").append(time).append("ms]}");
             logger.warn(builder.toString());
-//        }
+        }
         // 执行完上面的任务后，不改变原有的sql执行过程
         return proceed;
     }
 
-    // 如果参数是String，则添加单引号， 如果是日期，则转换为时间格式器并加单引号； 对参数是null和不是null的情况作了处理
+    /**
+     * 如果参数是String，则添加单引号，
+     * 如果是日期，则转换为时间格式器并加单引号；
+     * 对参数是null和不是null的情况作了处理
+     */
     private static String getParameterValue(Object obj) {
         String value = null;
         if (obj instanceof String) {

@@ -63,9 +63,36 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
 
-        limitRequestFrequency(request, response);
+        String ipAddress = requestUtil.getIpAddress(request);
+        String redisKey = RedisConfig.REDIS_IP_PREFIX + ipAddress;
+        //缓存时间 2s
+        // 127.0.0.1_/blog/hotBlog
+        if (redisTemplate.hasKey(redisKey)) {
+            String value = redisTemplate.opsForValue().get(redisKey);
+            Integer count = Integer.parseInt(value);
+            if (count > JwtTokenFilter.LIMIT_REQUEST_FREQUENCY_COUNT) {
+                //请求频繁
+                request.getRequestDispatcher(ErrorController.FREQUENT_OPERATION).forward(request, response);
+                return;
+            } else {
+                count++;
+                redisTemplate.opsForValue().set(redisKey, count.toString(), RedisConfig.REDIS_LIMIT_REQUEST_FREQUENCY_TIME, TimeUnit.MILLISECONDS);
+            }
 
+        } else {
+            redisTemplate.opsForValue().set(redisKey, "1", RedisConfig.REDIS_LIMIT_REQUEST_FREQUENCY_TIME, TimeUnit.MILLISECONDS);
+        }
 
+        checkPermission(request, response, chain);
+    }
+
+    /**
+     * 校验权限
+     *
+     * @param request
+     * @param response
+     */
+    private void checkPermission(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         boolean giveFlag = false;
         String authHeader = request.getHeader(jwtConfig.getHeader());
 
@@ -106,31 +133,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
-    /**
-     * 校验请求是否过于频繁
-     *
-     * @param request
-     */
-    private void limitRequestFrequency(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String ipAddress = requestUtil.getIpAddress(request);
-        String redisKey = RedisConfig.REDIS_IP_PREFIX + ipAddress;
-        //缓存时间 2s
-        // 127.0.0.1_/blog/hotBlog
-        if (redisTemplate.hasKey(redisKey)) {
-            String value = redisTemplate.opsForValue().get(redisKey);
-            Integer count = Integer.parseInt(value);
-            if (count > JwtTokenFilter.LIMIT_REQUEST_FREQUENCY_COUNT) {
-                //请求频繁
-                request.getRequestDispatcher(ErrorController.FREQUENT_OPERATION).forward(request, response);
-            } else {
-                count++;
-                redisTemplate.opsForValue().set(redisKey, count.toString(), RedisConfig.REDIS_LIMIT_REQUEST_FREQUENCY_TIME, TimeUnit.MILLISECONDS);
-            }
-
-        } else {
-            redisTemplate.opsForValue().set(redisKey, "1", RedisConfig.REDIS_LIMIT_REQUEST_FREQUENCY_TIME, TimeUnit.MILLISECONDS);
-        }
-    }
 }
 

@@ -14,7 +14,7 @@
 
     <insert id="saveAnnouncement" parameterType="Announcement">
         INSERT INTO announcement
-        VALUES (null,#{title},#{body},#{top})
+        VALUES (null,#{title},#{body},#{top},#{time})
     </insert>
 
     <delete id="deleteAnnouncementById" parameterType="Integer">

@@ -6,6 +6,8 @@ import com.zzx.config.RedisConfig;
 import com.zzx.dao.BlogDao;
 import com.zzx.dao.TagDao;
 import com.zzx.model.pojo.Blog;
+import com.zzx.utils.LoggerUtil;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -33,6 +35,8 @@ public class BlogTask {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
+    private Logger logger = LoggerUtil.loggerFactory(this.getClass());
+
     /**
      * 1000ms 1s
      * 10 min 执行一次
@@ -40,11 +44,12 @@ public class BlogTask {
      */
     @Scheduled(fixedRate = 1000 * 60 * 10)
     private void blogTask() {
-        System.out.println("开始更新hotblog");
+
         try {
             updateRedisHotBlogList();
+            logger.info("热门博客列表更新成功");
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error("热门博客列表更新失败");
         }
 
 

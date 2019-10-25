@@ -78,6 +78,11 @@ public class BlogService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    /**
+     * 返回的首页博客列表内容的最大字符数
+     */
+    private static final int MAX_BODY_CHAR_COUNT = 150;
+
 
     /**
      * 保存图片,返回url
@@ -311,6 +316,14 @@ public class BlogService {
 
         }
 
+        // 截取前150个字符 减少网络io
+        for (Blog blog : blogs) {
+            String body = blog.getBody();
+            if (body.length() > BlogService.MAX_BODY_CHAR_COUNT) {
+
+                blog.setBody(body.substring(0, BlogService.MAX_BODY_CHAR_COUNT));
+            }
+        }
 
         return blogs;
 
