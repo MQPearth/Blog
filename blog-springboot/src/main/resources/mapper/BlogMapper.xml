@@ -55,7 +55,7 @@
     </select>
 
     <select id="findHomeBlog" resultMap="Blog">
-        SELECT blog_id,blog_title, blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        SELECT blog_id,blog_title, blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_reward
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
         WHERE b.blog_state = 1
         ORDER BY blog_time DESC
@@ -63,7 +63,7 @@
     </select>
 
     <select id="findHotBlog" parameterType="Integer" resultMap="Blog">
-        SELECT blog_id,blog_title, blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        SELECT blog_id,blog_title, blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_reward
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
         WHERE blog_state = 1
         ORDER BY blog_blogViews DESC,blog_discussCount DESC
