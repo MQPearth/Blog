@@ -182,7 +182,7 @@ CREATE TABLE `user` (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('1', 'admin', '$2a$10$usmASSUxqidbn2RrQi4jdeVWUcFyTfmwZgTxSy8FIXQ5CVpm/0qEa', 'xxxxx@xxxx.com', '1');
+INSERT INTO `user` VALUES ('1', 'admin', '$2a$10$usmASSUxqidbn2RrQi4jdeVWUcFyTfmwZgTxSy8FIXQ5CVpm/0qEa', 'xxxxx@xxxx.com', '1', 'null');
 
 -- ----------------------------
 -- Table structure for user_role
