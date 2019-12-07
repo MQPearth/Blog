@@ -18,6 +18,11 @@
 #### Tip
 maven 项目 需要maven环境
 
+#### Run
+```
+blog-springboot/src/main/java/com/zzx/Application.java
+```
+
 项目打包
 ```
 mvn clean package
