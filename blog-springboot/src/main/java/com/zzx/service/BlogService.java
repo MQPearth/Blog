@@ -152,8 +152,13 @@ public class BlogService {
 
         //删除博客归档的缓存
         redisTemplate.delete(RedisConfig.REDIS_STATISTICAL);
+
         //移除 最后一位
-        redisTemplate.opsForList().rightPop(RedisConfig.REDIS_NEW_BLOG);
+        if (redisTemplate.opsForList().size(RedisConfig.REDIS_NEW_BLOG) >= RedisConfig.REDIS_NEW_BLOG_COUNT) {
+            redisTemplate.opsForList().rightPop(RedisConfig.REDIS_NEW_BLOG);
+        }
+
+
         // 获取标签名
         blog.setTags(tagDao.findTagByBlogId(blog.getId()));
         // 存入newblog 的左边第一位
