@@ -35,7 +35,7 @@
   </div>
 </template>
 <script>
-  //vue不支持文件名为admin的文件
+  //vue不支持文件名为admin的文件（也许吧）
   export default {
     name: 'admins',
     data() {
