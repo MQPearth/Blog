@@ -26,4 +26,10 @@
         where user_id = #{user.id}
     </update>
 
+    <select id="findLoginByUserId" parameterType="Integer" resultMap="Login">
+        SELECT user_id, login_ip, login_time
+        FROM login
+        WHERE user_id = #{userId}
+    </select>
+
 </mapper>
