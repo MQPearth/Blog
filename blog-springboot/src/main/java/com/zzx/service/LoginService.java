@@ -48,8 +48,12 @@ public class LoginService {
         login.setUser(user);//绑定用户
         login.setIp(requestUtil.getIpAddress(request));//获取操作ip
         login.setTime(dateUtil.getCurrentDate());//操作时间
-        loginDao.updateLogin(login);
 
+        if (null == loginDao.findLoginByUserId(user.getId())) {
+            loginDao.saveLogin(login);
+        } else {
+            loginDao.updateLogin(login);
+        }
     }
 
 }

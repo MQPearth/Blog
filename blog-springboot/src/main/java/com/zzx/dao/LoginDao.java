@@ -28,4 +28,10 @@ public interface LoginDao {
      * @param login
      */
     void updateLogin(Login login);
+
+    /**
+     * 根据用户id找登录操作表
+     * @param userId
+     */
+    Login findLoginByUserId(Integer userId);
 }
