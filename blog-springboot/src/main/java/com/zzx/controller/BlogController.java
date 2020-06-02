@@ -297,5 +297,22 @@ public class BlogController {
         }
     }
 
+    /**
+     * @Description:
+     * @Param: [blogId]
+     * @return: com.zzx.model.entity.Result
+     * @Author: Tyson
+     * @Date: 2020/5/30/0030 12:55
+     */
+    @ApiOperation(value = "获取博客点赞数")
+    @GetMapping("/getBlogLikeCount/{blogId}")
+    public Result getBlogLikeCount(@PathVariable Integer blogId) {
+        try {
+            int likeCount = blogService.getBlogLikeCountByBlogId(blogId);
+            return Result.create(StatusCode.OK, "获取点赞数成功", likeCount);
+        } catch (RuntimeException re) {
+            return Result.create(StatusCode.ERROR, re.getMessage());
+        }
+    }
 
 }

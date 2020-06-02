@@ -49,4 +49,15 @@ public class RedisConfig {
      * 请求频率限制 缓存时间
      */
     public static final long REDIS_LIMIT_REQUEST_FREQUENCY_TIME = 1000L;
+
+    /**
+     * 用户点赞状态key
+     */
+    public static final String MAP_BLOG_LIKE_COUNT_KEY = "MAP_BLOG_LIKE_COUNT";
+
+    /**
+     * 博文点赞数key
+     */
+    public static final String MAP_USER_LIKE_KEY = "MAP_USER_LIKE_KEY";
+
 }

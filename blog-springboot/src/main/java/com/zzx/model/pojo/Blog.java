@@ -1,6 +1,5 @@
 package com.zzx.model.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.ToString;
 
@@ -59,5 +58,16 @@ public class Blog implements Serializable {
      */
     private List<Tag> tags;
 
+    /**
+     * 博文点赞数
+     */
+    private Integer likeCount;
 
+    public Blog() {
+    }
+
+    public Blog(int blogId, int likeCount) {
+        this.id = blogId;
+        this.likeCount = likeCount;
+    }
 }

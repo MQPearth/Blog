@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzx.dao.UserLikeDao">
+
+    <resultMap id="UserLike" type="UserLike">
+        <id property="id" column="id"/>
+        <result property="user.id" column="user_id"/>
+        <result property="blog.id" column="blog_id"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <insert id="saveUserLike" parameterType="UserLike">
+        INSERT INTO user_like(id, user_id, blog_id, status)
+        VALUES(#{id}, #{user.id}, #{blog.id}, #{status})
+        ON DUPLICATE KEY UPDATE status = #{status}
+    </insert>
+
+    <select id="getUserLike" resultMap="UserLike">
+        SELECT id, user_id, blog_id, status
+        FROM user_like
+        WHERE user_id = #{userId} AND blog_id = #{blogId}
+    </select>
+
+</mapper>

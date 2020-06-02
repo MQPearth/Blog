@@ -32,6 +32,7 @@ CREATE TABLE `blog` (
   `blog_time` datetime NOT NULL COMMENT '博文发布时间',
   `blog_state` int(11) NOT NULL COMMENT '博文状态--0 删除 1正常',
   `user_id` int(11) NOT NULL COMMENT '用户id',
+  `like_count` int(11) NOT NULL DEFAULT 0 COMMENT '博文点赞总数',
   PRIMARY KEY (`blog_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 
@@ -183,6 +184,22 @@ CREATE TABLE `user` (
 -- Records of user
 -- ----------------------------
 INSERT INTO `user` VALUES ('1', 'admin', '$2a$10$usmASSUxqidbn2RrQi4jdeVWUcFyTfmwZgTxSy8FIXQ5CVpm/0qEa', 'xxxxx@xxxx.com', '1', 'null');
+
+-- ----------------------------
+-- Table structure for user_like
+-- ----------------------------
+DROP TABLE IF EXISTS `user_like`;
+CREATE TABLE `user_like`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL COMMENT '点赞的用户id',
+  `blog_id` int(11) NOT NULL COMMENT '被点赞的博文id',
+  `status` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '1' COMMENT '点赞状态，0取消，1点赞',
+  `create_time` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `ul1`(`user_id`, `blog_id`) USING BTREE,
+  UNIQUE INDEX `ul2`(`blog_id`, `user_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 131 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户点赞表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for user_role

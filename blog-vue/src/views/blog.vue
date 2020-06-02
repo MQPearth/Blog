@@ -31,12 +31,15 @@
       <!-- 以下是预览模式配置 -->
       <!--:toolbarsFlag="false"  :subfield="false" defaultOpen="preview"-->
 
-      <div style="margin: 0 auto;width: 20%" class="hidden-xs-only" v-if="userReward!=undefined&&userReward!==null">
+      <div style="margin: 0 auto;width: 30%" class="hidden-xs-only" v-if="userReward!=undefined&&userReward!==null">
         <br/>
         <el-popover placement="bottom" width="250px" height="250px" trigger="hover">
           <img alt="打赏码" :src="userReward" width="250px" height="250px"/>
           <el-button type="text" slot="reference" icon="el-icon-trophy" round>写的不错，打赏一个</el-button>
         </el-popover>
+        <el-button type="text" :class="[like?'el-tyson-good-fill':'el-tyson-good']" @click="likeThis">
+          &nbsp;{{this.like == 0 ? '点赞' : '已赞'}}&nbsp;{{likeCount}}
+        </el-button>
       </div>
 
 
@@ -113,6 +116,7 @@
   import discuss from '@/api/discuss'
   import reply from '@/api/reply'
   import date from '@/utils/date'
+  import userLike from '@/api/userLike'
 
   import 'element-ui/lib/theme-chalk/display.css';
 
@@ -137,7 +141,9 @@
 
         discussBody: '',//评论内容
         replyFlag: false,  // 是否显示回复按钮
-        replyBody: ''   //回复内容
+        replyBody: '',   //回复内容
+        like: 0,   //未点赞：0，点赞：1
+        likeCount: 0,  //点赞次数
       }
     },
     watch: {
@@ -181,6 +187,14 @@
         } else {
           isClick = false;
         }
+
+        userLike.getBlogLikeCount(this.blogId).then(res => {
+          this.likeCount = res.data;
+        });
+
+        userLike.isUserLike(this.blogId).then(res => {
+          this.like = res.data;
+        });
 
         blog.getBlogById(this.blogId, isClick).then(res => {
             this.title = res.data.title;
@@ -336,6 +350,15 @@
       back() {
         history.back()
       }
+      ,
+      likeThis() {
+        userLike.saveUserLike(this.blogId, this.like == 0 ? 1 : 0).then(res => {
+          this.like = this.like == 0 ? 1 : 0;
+          userLike.getBlogLikeCount(this.blogId).then(res => {
+            this.likeCount = res.data;
+          });
+        });
+      }
     }
   }
 </script>
@@ -358,5 +381,22 @@
   #discussList {
     text-align: left;
     padding: 2% 1% 1% 3%;
+  }
+
+  /*第三方icon，点赞&取消点赞*/
+  [class^="el-tyson-good"], [class*="el-tyson-good"] {
+    font-family:"iconfont" !important;
+    font-size:16px;
+    font-style:normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  [class^="el-tyson-good-fill"], [class*="el-tyson-good-fill"] {
+    font-family:"iconfont" !important;
+    font-size:16px;
+    font-style:normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 </style>

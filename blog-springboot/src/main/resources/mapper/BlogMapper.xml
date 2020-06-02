@@ -16,6 +16,7 @@
         <result property="user.id" column="user_id"/>
         <result property="user.name" column="user_name"/>
         <result property="user.reward" column="user_reward"/>
+        <result property="likeCount" column="like_count"/>
     </resultMap>
 
     <insert id="saveBlog" parameterType="Blog" useGeneratedKeys="true" keyProperty="id" keyColumn="blog_id">
@@ -29,7 +30,7 @@
     </insert>
 
     <select id="findBlogById" parameterType="Integer" resultMap="Blog">
-        SELECT blog_id,blog_title,blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_reward
+        SELECT blog_id,blog_title,blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_reward,like_count
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
         WHERE blog_id = #{value} AND b.blog_state = 1
     </select>
@@ -155,6 +156,16 @@
     <select id="findBlogCountByTagId" parameterType="Integer" resultType="Integer">
         SELECT COUNT(1) from blog_tag bt LEFT JOIN blog b on bt.blog_id = b.blog_id
         WHERE tag_id = #{value} AND b.blog_state = 1
+    </select>
+
+    <update id="updateLikeCount" parameterType="int">
+        UPDATE blog SET like_count = IF(#{count} &lt; 0, 0, #{count})
+        WHERE blog_id = #{blogId}
+    </update>
+
+    <select id="getBlogLikeCountByBlogId" parameterType="int" resultType="int">
+        SELECT like_count FROM blog
+        WHERE blog_id = #{blogId}
     </select>
 
 </mapper>

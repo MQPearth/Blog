@@ -24,7 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class BlogService {
@@ -77,6 +80,9 @@ public class BlogService {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private RedisService redisService;
 
     /**
      * 返回的首页博客列表内容的最大字符数
@@ -574,5 +580,41 @@ public class BlogService {
      */
     public Long getAllBlogCount() {
         return blogDao.getAllBlogCount();
+    }
+
+    /**
+     * @Description: 获取用户点赞数
+     * @Param: [blogId]
+     * @return: int
+     * @Author: Tyson
+     * @Date: 2020/5/30/0030 14:16
+     */
+    public int getBlogLikeCountByBlogId(Integer blogId) {
+        int likeCount;
+        String likeCountKey = String.valueOf(blogId);
+        //缓存不存在，查询数据库
+        if (!redisTemplate.opsForHash().hasKey(RedisConfig.MAP_BLOG_LIKE_COUNT_KEY, likeCountKey)) {
+            likeCount =  blogDao.getBlogLikeCountByBlogId(blogId);
+            redisTemplate.opsForHash().put(RedisConfig.MAP_BLOG_LIKE_COUNT_KEY, likeCountKey, String.valueOf(likeCount));
+        } else {
+            likeCount = Integer.parseInt((String)redisTemplate.opsForHash().get(RedisConfig.MAP_BLOG_LIKE_COUNT_KEY, likeCountKey));
+        }
+        return likeCount;
+    }
+
+    /**
+    * @Description: 将Redis博文点赞数存储到数据库，定时任务
+    * @Param: []
+    * @return: void
+    * @Author: Tyson
+    * @Date: 2020/5/30/0030 14:22
+    */
+    @Transactional(rollbackFor = Exception.class)
+    public void transLikeCountFromRedis2DB() {
+        List<Blog> blogList = redisService.getBlogLikeCountFromRedis();
+        for (Blog blog : blogList) {
+            int count = blog.getLikeCount();
+            blogDao.updateLikeCount(blog.getId(), count);
+        }
     }
 }

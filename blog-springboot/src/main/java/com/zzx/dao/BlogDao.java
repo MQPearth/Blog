@@ -161,4 +161,22 @@ public interface BlogDao {
      * @param blog
      */
     void updateBlog(Blog blog);
+
+    /**
+    * @Description: 更新博文点赞数
+    * @Param: [blogId, count]
+    * @return: void
+    * @Author: Tyson
+    * @Date: 2020/5/30/0030 14:47
+    */
+    void updateLikeCount(Integer blogId, Integer count);
+
+    /**
+    * @Description: 根据用户id获取博文点赞数
+    * @Param: [blogId]
+    * @return: java.lang.Integer
+    * @Author: Tyson
+    * @Date: 2020/5/30/0030 15:29
+    */
+    Integer getBlogLikeCountByBlogId(Integer blogId);
 }
