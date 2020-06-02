@@ -192,9 +192,11 @@
           this.likeCount = res.data;
         });
 
-        userLike.isUserLike(this.blogId).then(res => {
-          this.like = res.data;
-        });
+        if (this.isLogin()) {
+          userLike.isUserLike(this.blogId).then(res => {
+            this.like = res.data;
+          });
+        }
 
         blog.getBlogById(this.blogId, isClick).then(res => {
             this.title = res.data.title;
@@ -349,15 +351,27 @@
       ,
       back() {
         history.back()
-      }
-      ,
+      },
+      isLogin() {
+        if (this.$store.state.token !== '') {
+          return true;
+        } else {
+          return false;
+        }
+      },
       likeThis() {
-        userLike.saveUserLike(this.blogId, this.like == 0 ? 1 : 0).then(res => {
-          this.like = this.like == 0 ? 1 : 0;
-          userLike.getBlogLikeCount(this.blogId).then(res => {
-            this.likeCount = res.data;
+
+        if (this.isLogin()) {
+          userLike.saveUserLike(this.blogId, this.like == 0 ? 1 : 0).then(res => {
+            this.like = this.like == 0 ? 1 : 0;
+            userLike.getBlogLikeCount(this.blogId).then(res => {
+              this.likeCount = res.data;
+            });
           });
-        });
+        } else {
+          this.$message.error("请先登录")
+        }
+
       }
     }
   }
@@ -385,17 +399,17 @@
 
   /*第三方icon，点赞&取消点赞*/
   [class^="el-tyson-good"], [class*="el-tyson-good"] {
-    font-family:"iconfont" !important;
-    font-size:16px;
-    font-style:normal;
+    font-family: "iconfont" !important;
+    font-size: 16px;
+    font-style: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   [class^="el-tyson-good-fill"], [class*="el-tyson-good-fill"] {
-    font-family:"iconfont" !important;
-    font-size:16px;
-    font-style:normal;
+    font-family: "iconfont" !important;
+    font-size: 16px;
+    font-style: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

@@ -23,6 +23,8 @@
 * other                                 其他文档
   * prototype.md		   原型文档
   * 踩坑整理.docx           写本项目遇到的坑
+  * 博客缓存.png            redis博客缓存说明
+  * 后端功能说明.png     后端功能说明
 * conf                                   已配置的项目压缩文件
   * nginx.conf                 nginx配置文件，已配置好
 * blog.sql                             mysql数据库结构
