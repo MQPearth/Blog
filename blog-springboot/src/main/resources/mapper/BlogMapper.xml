@@ -21,7 +21,7 @@
 
     <insert id="saveBlog" parameterType="Blog" useGeneratedKeys="true" keyProperty="id" keyColumn="blog_id">
         INSERT INTO blog
-        VALUES (null,#{title},#{body},#{discussCount},#{blogViews},#{time},#{state},#{user.id})
+        VALUES (null,#{title},#{body},#{discussCount},#{blogViews},#{time},#{state},#{user.id},#{likeCount})
     </insert>
 
     <insert id="saveBlogTag">

@@ -45,12 +45,12 @@ public class UserLikeService {
     private RedisService redisService;
 
     /**
-    * @Description: 保存用户点赞数据
-    * @Param: [userLike]
-    * @return: void
-    * @Author: Tyson
-    * @Date: 2020/5/30/0030 11:39
-    */
+     * @Description: 保存用户点赞数据
+     * @Param: [userLike]
+     * @return: void
+     * @Author: Tyson
+     * @Date: 2020/5/30/0030 11:39
+     */
     public void saveUserLike(UserLike userLike) {
         User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
         int blogId = userLike.getBlog().getId();
@@ -62,7 +62,7 @@ public class UserLikeService {
         String blogLikeCountKey = String.valueOf(blogId);
         //缓存不存在，查询数据库，然后存入Redis，key为blogId，value为点赞数
         if (!redisTemplate.opsForHash().hasKey(RedisConfig.MAP_BLOG_LIKE_COUNT_KEY, blogLikeCountKey)) {
-            int likeCount =  blogDao.getBlogLikeCountByBlogId(blogId);
+            int likeCount = blogDao.getBlogLikeCountByBlogId(blogId);
             redisTemplate.opsForHash().put(RedisConfig.MAP_BLOG_LIKE_COUNT_KEY, blogLikeCountKey, String.valueOf(likeCount + val));
         } else {
             redisTemplate.opsForHash().increment(RedisConfig.MAP_BLOG_LIKE_COUNT_KEY, blogLikeCountKey, val);
@@ -70,12 +70,12 @@ public class UserLikeService {
     }
 
     /**
-    * @Description: 用户是否点过赞
-    * @Param: [blogId]
-    * @return: boolean
-    * @Author: Tyson
-    * @Date: 2020/5/30/0030 14:09
-    */
+     * @Description: 用户是否点过赞
+     * @Param: [blogId]
+     * @return: boolean
+     * @Author: Tyson
+     * @Date: 2020/5/30/0030 14:09
+     */
     public boolean getUserLike(Integer blogId) {
         User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
         String userLikeKey = getUserLikeKey(blogId, user.getId());
@@ -95,12 +95,12 @@ public class UserLikeService {
     }
 
     /**
-    * @Description: 将Redis点赞状态存储到数据库，定时任务
-    * @Param: []
-    * @return: void
-    * @Author: Tyson
-    * @Date: 2020/5/30/0030 14:17
-    */
+     * @Description: 将Redis点赞状态存储到数据库，定时任务
+     * @Param: []
+     * @return: void
+     * @Author: Tyson
+     * @Date: 2020/5/30/0030 14:17
+     */
     @Transactional(rollbackFor = Exception.class)
     public void transUserLikeFromRedis2DB() {
         List<UserLike> userLikeList = redisService.getUserLikeFromRedis();
@@ -110,16 +110,16 @@ public class UserLikeService {
     }
 
     /**
-    * @Description: 用户点赞状态key
-    * @Param: [userId, blogId]
-    * @return: java.lang.String
-    * @Author: Tyson
-    * @Date: 2020/5/30/0030 14:21
-    */
+     * @Description: 用户点赞状态key
+     * @Param: [userId, blogId]
+     * @return: java.lang.String
+     * @Author: Tyson
+     * @Date: 2020/5/30/0030 14:21
+     */
     public static String getUserLikeKey(int blogId, int userId) {
         StringBuilder builder = new StringBuilder();
         builder.append(blogId);
-        builder.append("::");
+        builder.append(RedisConfig.REDIS_LIKE_MID);
         builder.append(userId);
         return builder.toString();
     }

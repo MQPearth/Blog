@@ -147,6 +147,8 @@ public class BlogService {
         blog.setBody(blogBody);
         //1 正常状态
         blog.setState(1);
+        //点赞数
+        blog.setLikeCount(0);
         //发布时间
         blog.setTime(dateUtil.getCurrentDate());
         blogDao.saveBlog(blog);

@@ -7,6 +7,7 @@ import com.zzx.service.UserLikeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -31,8 +32,14 @@ public class UserLikeController {
      */
     @ApiOperation(value = "保存点赞数据")
     @PostMapping("/saveUserLike")
+    @PreAuthorize("hasAuthority('USER')")
     public Result saveUserLike(UserLike userLike) {
+        if (userLikeService.getUserLike(userLike.getBlog().getId())) {
+            return Result.create(StatusCode.ERROR, "你已点过赞");
+        }
+
         try {
+
             userLikeService.saveUserLike(userLike);
             return Result.create(StatusCode.OK, "点赞记录保存成功");
         } catch (RuntimeException re) {
@@ -41,14 +48,15 @@ public class UserLikeController {
     }
 
     /**
-    * @Description: 判断用户是否点过赞
-    * @Param: [blogId]
-    * @return: com.zzx.model.entity.Result
-    * @Author: Tyson
-    * @Date: 2020/5/30/0030 14:01
-    */
+     * @Description: 判断用户是否点过赞
+     * @Param: [blogId]
+     * @return: com.zzx.model.entity.Result
+     * @Author: Tyson
+     * @Date: 2020/5/30/0030 14:01
+     */
     @ApiOperation(value = "用户是否点过赞")
     @GetMapping("/isUserLike/{blogId}")
+    @PreAuthorize("hasAuthority('USER')")
     public Result getUserLike(@PathVariable Integer blogId) {
         try {
             return Result.create(StatusCode.OK, "获取点赞记录成功", userLikeService.getUserLike(blogId));

@@ -45,15 +45,22 @@ public class RedisConfig {
     public static final String REDIS_IP_PREFIX = "IP_";
 
 
+
+
     /**
      * 请求频率限制 缓存时间
      */
-    public static final long REDIS_LIMIT_REQUEST_FREQUENCY_TIME = 1000L;
+    public static final long REDIS_LIMIT_REQUEST_FREQUENCY_TIME = 100L;
 
     /**
      * 用户点赞状态key
      */
     public static final String MAP_BLOG_LIKE_COUNT_KEY = "MAP_BLOG_LIKE_COUNT";
+
+    /**
+     * IP_127.0.0.1
+     */
+    public static final String REDIS_LIKE_MID = "::";
 
     /**
      * 博文点赞数key
