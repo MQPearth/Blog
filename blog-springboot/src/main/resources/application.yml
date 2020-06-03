@@ -20,7 +20,7 @@ spring:
   ###邮箱配置
   mail:
     host: smtp.qq.com
-    port: 25
+    port: 465
     username: ***@qq.com
     password: ***
     default-encoding: UTF-8
@@ -31,6 +31,10 @@ spring:
           starttls:
             enable: true
             required: true
+           ### 如果使用qq邮箱，且部署在阿里云，需要启动ssl，且端口配置为465
+#         ssl:
+#            enable: true
+
 
   ###Redis
   redis:
