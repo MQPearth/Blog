@@ -41,7 +41,7 @@ public class RedisService {
 
                 String key = (String)entry.getKey();
                 //拆分key，blogId::userId
-                String[] keyArr = key.split("::");
+                String[] keyArr = key.split(RedisConfig.REDIS_LIKE_MID);
                 int blogId  = Integer.parseInt(keyArr[0]);
                 int userId= Integer.parseInt(keyArr[1]);
                 int status = Integer.parseInt((String)entry.getValue());
