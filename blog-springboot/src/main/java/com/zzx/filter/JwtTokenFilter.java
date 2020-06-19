@@ -67,8 +67,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String redisKey = RedisConfig.REDIS_IP_PREFIX + ipAddress;
         //缓存时间 2s 会影响swagger-ui的使用，建议开发时调整JwtTokenFilter.LIMIT_REQUEST_FREQUENCY_COUNT的值
         // 127.0.0.1_/blog/hotBlog
-        if (redisTemplate.hasKey(redisKey)) {
-            String value = redisTemplate.opsForValue().get(redisKey);
+        String value = redisTemplate.opsForValue().get(redisKey);
+        if (null != value) {
             Integer count = Integer.parseInt(value);
             if (count > JwtTokenFilter.LIMIT_REQUEST_FREQUENCY_COUNT) {
                 //请求频繁
