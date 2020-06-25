@@ -15,3 +15,8 @@ selenium-debug.log
 *.njsproj
 *.sln
 blog-vue.iml
+.babelrc
+.editorconfig
+.eslintignore
+.eslintrc.js
+.postcssrc.js
