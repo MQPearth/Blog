@@ -64,15 +64,34 @@
           return;
         }
         this.sendMailFlag = true;
-        user.sendMail(this.mail).then(res => {
-          this.$message({
-            message: '发送成功',
-            type: 'success'
-          });
+
+        const _mail = this.mail;
+        const _this = this;
+        user.sendMail(_mail).then(res => {
+          //成功调用接口后设置定时器，每隔600ms查询一次邮件状态
+          var intervalId = setInterval(function () {
+            user.getMailSendState(_mail).then(res => {
+              //邮件状态发生改变时
+              if (res.data !== '0') {
+                //清除定时器
+                clearInterval(intervalId);
+                if (res.data === '1') {
+                  _this.$message.success('发送成功');
+                } else {
+                  _this.$message.error('发送失败');
+                }
+                _this.sendMailFlag = false;
+              }
+            });
+          }, 600);
+
+        }).catch(() => {
           this.sendMailFlag = false;
-        }).catch(()=>{
-          this.sendMailFlag = false;
+          this.$message.error('发送失败');
         })
+
+
+
       },
       forgetPwd() {
         if (this.userName.length <= 0) {

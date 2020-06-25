@@ -45,8 +45,6 @@ public class RedisConfig {
     public static final String REDIS_IP_PREFIX = "IP_";
 
 
-
-
     /**
      * 请求频率限制 缓存时间
      */
@@ -58,7 +56,8 @@ public class RedisConfig {
     public static final String MAP_BLOG_LIKE_COUNT_KEY = "MAP_BLOG_LIKE_COUNT";
 
     /**
-     * IP_127.0.0.1
+     * MAP_USER_LIKE_KEY 行内key 的中间字符
+     * blogId::userId
      */
     public static final String REDIS_LIKE_MID = "::";
 

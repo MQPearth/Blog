@@ -4,8 +4,10 @@ package com.zzx.mq;
 import com.zzx.config.MailConfig;
 import com.zzx.config.RabbitMqConfig;
 import com.zzx.model.entity.MailMessage;
+import com.zzx.service.UserService;
 import com.zzx.utils.DateUtil;
 import com.zzx.utils.LoggerUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -24,32 +26,33 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @RabbitListener(queues = RabbitMqConfig.MAIL_QUEUE)
+@Slf4j
 public class MailListener {
-
-    private Logger logger = LoggerUtil.loggerFactory(this.getClass());
-
 
 
     @Autowired
     private JavaMailSender mailSender;
 
     @Autowired
-    private MailMessage mailMessage;
+    private UserService userService;
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private MailMessage mailMessage;
+
 
     @RabbitHandler
     public void executeSms(Map<String, String> map) {
         String mail = map.get("mail");
         String code = map.get("code");
 
-
         try {
-            this.sendMail(mail, code);
-            logger.info(mail + "-" + code + "-发送成功");
+//            this.sendMail(mail, code);
+            Thread.sleep(6000);
+            userService.updateMailSendState(mail, code, MailConfig.MAIL_STATE_OK);
+            log.info(mail + "-" + code + "-发送成功");
         } catch (Exception e) {
-            logger.error(mail + code + "发送失败-" + e.getMessage());
+            userService.updateMailSendState(mail, code, MailConfig.MAIL_STATE_ERROR);
+            log.error(mail + code + "发送失败-" + e.getMessage());
         }
     }
 
@@ -57,7 +60,6 @@ public class MailListener {
         //发送邮件
         mailSender.send(mailMessage
                 .create(mail, "邮箱验证码", "邮箱验证码：" + code + "，" + MailConfig.EXPIRED_TIME + "分钟内有效"));
-
 
     }
 }

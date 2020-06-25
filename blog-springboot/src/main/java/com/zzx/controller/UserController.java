@@ -94,35 +94,6 @@ public class UserController {
     }
 
 
-//    /**
-//     * 创建管理员
-//     *
-//     * @param user
-//     * @return
-//     */
-//    @PreAuthorize("hasAuthority('USER')")
-//    @ApiOperation(value = "创建管理员", notes = "用户名+密码+邮箱 name+password+mail")
-//    @PostMapping("/createAdmin")
-//    public Result createAdmin(User user) {
-//        if (!formatUtil.checkStringNull(user.getName(), user.getPassword(), user.getMail())) {
-//            return Result.create(StatusCode.ERROR, "参数错误");
-//        }
-//
-//        //查询是否已有管理员
-//        Integer count = roleService.findAdminRoleCount("ADMIN");
-//        if (count > 0) {
-//            return Result.create(StatusCode.ACCESSERROR, "拒绝访问");
-//        } else {
-//            //无 创建
-//            try {
-//                userService.createAdmin(user);
-//                return Result.create(StatusCode.OK, "管理员创建成功");
-//            } catch (RuntimeException e) {
-//                return Result.create(StatusCode.OK, "创建失败，" + e.getMessage());
-//            }
-//        }
-//    }
-
     /**
      * 用户注册
      *
@@ -205,6 +176,29 @@ public class UserController {
             userService.sendMail(mail);
 
             return Result.create(StatusCode.OK, "发送成功");
+        }
+    }
+
+
+    /**
+     * 查询邮件发送状态
+     *
+     * @param mail
+     * @return
+     */
+    @ApiOperation(value = "查询邮件发送状态", notes = "查询邮件发送状态 0 发送中 1 已发送 2 发送失败")
+    @PostMapping("/getMailSendState")
+    public Result getMailSendState(@RequestParam String mail) {
+        if (!(formatUtil.checkStringNull(mail))) {
+            return Result.create(StatusCode.ERROR, "邮箱格式错误");
+        }
+        String value = redisTemplate.opsForValue().get(MailConfig.REDIS_MAIL_KEY_PREFIX + mail);
+
+        if (null != value) {
+            char state = value.charAt(value.length() - 1);
+            return Result.create(StatusCode.OK, "查询成功", state);
+        } else {
+            return Result.create(StatusCode.ERROR, "邮件不存在");
         }
     }
 

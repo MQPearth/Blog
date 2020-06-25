@@ -93,6 +93,13 @@ export default {
       url: '/user/logout',
       method: 'get',
     })
+  },
+  getMailSendState(mail) {
+    return request({
+      url: '/user/getMailSendState',
+      method: 'post',
+      data: qs.stringify({'mail': mail})
+    })
   }
 
 

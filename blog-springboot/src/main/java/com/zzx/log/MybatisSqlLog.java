@@ -1,6 +1,7 @@
 package com.zzx.log;
 
 import com.zzx.utils.LoggerUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -33,9 +34,9 @@ import java.util.regex.Matcher;
         @Signature(type = Executor.class, method = "query", args = {MappedStatement.class,
                 Object.class, RowBounds.class, ResultHandler.class})})
 @Component
+@Slf4j
 public class MybatisSqlLog implements Interceptor {
 
-    private Logger logger = LoggerUtil.loggerFactory(this.getClass());
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -64,7 +65,7 @@ public class MybatisSqlLog implements Interceptor {
             StringBuilder builder = new StringBuilder();
             builder.append("{SQL:[").append(sql).append("],")
                     .append("Time:[").append(time).append("ms]}");
-            logger.warn(builder.toString());
+            log.warn(builder.toString());
         }
         // 执行完上面的任务后，不改变原有的sql执行过程
         return proceed;

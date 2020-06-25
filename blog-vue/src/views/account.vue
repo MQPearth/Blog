@@ -201,19 +201,36 @@
           this.updateMailToNewSendFlag = false;
           return;
         }
+
+        const _this = this;
         user.sendMail(mail).then(res => {
-          this.$message({
-            message: '发送成功',
-            type: 'success'
-          });
-          this.updatePwdSendFlag = false;
-          this.updateMailToOldSendFlag = false;
-          this.updateMailToNewSendFlag = false;
+          //成功调用接口后设置定时器，每隔600ms查询一次邮件状态
+          var intervalId = setInterval(function () {
+            user.getMailSendState(mail).then(res => {
+              //邮件状态发生改变时
+              if (res.data !== '0') {
+                //清除定时器
+                clearInterval(intervalId);
+                if (res.data === '1') {
+                  _this.$message.success('发送成功');
+                } else {
+                  _this.$message.error('发送失败');
+                }
+                _this.updatePwdSendFlag = false;
+                _this.updateMailToOldSendFlag = false;
+                _this.updateMailToNewSendFlag = false;
+
+              }
+            });
+          }, 600);
+
         }).catch(() => {
-          this.updatePwdSendFlag = false;
-          this.updateMailToOldSendFlag = false;
-          this.updateMailToNewSendFlag = false;
+          _this.updatePwdSendFlag = false;
+          _this.updateMailToOldSendFlag = false;
+          _this.updateMailToNewSendFlag = false;
+          _this.$message.error('发送失败');
         })
+
       },
       updatePwd() {
 

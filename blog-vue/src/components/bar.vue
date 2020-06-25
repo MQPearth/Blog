@@ -210,7 +210,7 @@
       },
       sendMail() {//发送邮件
 
-        var reg = new RegExp(/^([a-zA-Z0-9._-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/);
+        const reg = new RegExp(/^([a-zA-Z0-9._-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/);
         if (!reg.test(this.form.registerMail)) {//检测字符串是否符合正则表达式
           this.$message({
             message: '邮箱格式不正确',
@@ -219,14 +219,29 @@
           return;
         }
         this.sendMailFlag = true;
-        user.sendMail(this.form.registerMail).then(res => {
-          this.$message({
-            message: '发送成功',
-            type: 'success'
-          });
-          this.sendMailFlag = false;
+        const mail = this.form.registerMail;
+        const _this = this;
+        user.sendMail(mail).then(res => {
+          //成功调用接口后设置定时器，每隔600ms查询一次邮件状态
+          var intervalId = setInterval(function () {
+            user.getMailSendState(mail).then(res => {
+              //邮件状态发生改变时
+              if (res.data !== '0') {
+                //清除定时器
+                clearInterval(intervalId);
+                if (res.data === '1') {
+                  _this.$message.success('发送成功');
+                } else {
+                  _this.$message.error('发送失败');
+                }
+                _this.sendMailFlag = false;
+              }
+            });
+          }, 600);
+
         }).catch(() => {
           this.sendMailFlag = false;
+          this.$message.error('发送失败');
         })
       },
       userRegister() {//用户注册

@@ -429,16 +429,18 @@ public class UserService implements UserDetailsService {
     public void sendMail(String mail) {
         //貌似线程不安全 范围100000 - 999999
         Integer random = randomUtil.nextInt(100000, 999999);
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>(2);
         String code = random.toString();
         map.put("mail", mail);
         map.put("code", code);
 
-        //保存发送记录
-        redisTemplate.opsForValue()
-                .set(MailConfig.REDIS_MAIL_KEY_PREFIX + mail, code, MailConfig.EXPIRED_TIME, TimeUnit.MINUTES);
 
+        //以直接模式存入消息队列
         rabbitTemplate.convertAndSend(RabbitMqConfig.MAIL_QUEUE, map);
+
+        //存入redis
+        updateMailSendState(mail, code, MailConfig.MAIL_STATE_WAIT);
+
 
     }
 
@@ -503,5 +505,21 @@ public class UserService implements UserDetailsService {
     public void logout() {
         String username = jwtTokenUtil.getUsernameFromRequest(request);
         redisTemplate.delete(JwtConfig.REDIS_TOKEN_KEY_PREFIX + username);
+    }
+
+
+    /**
+     * 更改邮件发送状态
+     *
+     * @param mail
+     * @param code
+     * @param state com.zzx.MailConfig.MAIL_STATE_*
+     * @see com.zzx.config.MailConfig
+     */
+    public void updateMailSendState(String mail, String code, int state) {
+        redisTemplate.opsForValue()
+                .set(MailConfig.REDIS_MAIL_KEY_PREFIX + mail,
+                        code + MailConfig.MAIL_STATE_MID_CHAR + state,
+                        MailConfig.EXPIRED_TIME, TimeUnit.MINUTES);
     }
 }
