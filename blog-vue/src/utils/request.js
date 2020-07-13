@@ -64,7 +64,7 @@ service.interceptors.response.use(
         store.commit('logout');
         MessageBox.confirm('你已被登出，点击确定返回首页', '状态异常', {
           confirmButtonText: '确 定',
-          cancelButtonText: '确 定',
+          showCancelButton: false,
           type: 'warning'
         }).then(() => {
           // window.location.href = '#/'
