@@ -54,7 +54,7 @@
 
 
 
-[JetBrains Open Source License](https://github.com/MQPearth/Blog)
+[JetBrains Open Source License](https://www.jetbrains.com/?from=Blog)
 
 <div align="left">
 <img src="img/jetbrains-training-partner.png"  height="300" width="300">
