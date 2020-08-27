@@ -49,3 +49,13 @@
 有毕设需求可以联系`1970432392@qq.com`
 
 # 项目停止维护
+
+
+
+
+
+[JetBrains Open Source License](https://github.com/MQPearth/Blog)
+
+<div align="left">
+<img src="img/jetbrains-training-partner.png"  height="300" width="300">
+</div>
