@@ -57,5 +57,5 @@
 [JetBrains Open Source License](https://www.jetbrains.com/?from=Blog)
 
 <div align="left">
-<img src="img/jetbrains-training-partner.png"  height="300" width="300">
+<img src="img/jetbrains-training-partner.png"  height="150" width="150">
 </div>
