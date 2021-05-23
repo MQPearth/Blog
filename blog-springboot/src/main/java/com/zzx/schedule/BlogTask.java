@@ -49,7 +49,7 @@ public class BlogTask {
         try {
             updateRedisHotBlogList();
             log.info("热门博客列表更新成功");
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             log.error("热门博客列表更新失败");
         }
 
