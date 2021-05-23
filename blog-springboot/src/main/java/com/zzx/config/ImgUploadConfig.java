@@ -9,24 +9,32 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * 文件上传相关属性
- **/
+ */
 @Component
 @ConfigurationProperties(prefix = "upload")
 public class ImgUploadConfig {
 
-    //静态资源对外暴露的访问路径
+    /**
+     * 静态资源对外暴露的访问路径
+     */
     private String staticAccessPath;
-    //文件上传目录
+    /**
+     * 文件上传目录
+     */
     private String uploadFolder;
-    //文件夹层数
+    /**
+     * 文件夹层数
+     */
     private Integer layerCount;
-    //文件夹内单位数
+    /**
+     * 文件夹内单位数
+     */
     private Integer folderSize;
 
-    private static ConcurrentLinkedQueue<File> availablePath = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<File> AVAILABLE_PATH = new ConcurrentLinkedQueue<>();
 
     public static ConcurrentLinkedQueue<File> getAvailablePath() {
-        return availablePath;
+        return AVAILABLE_PATH;
     }
 
     public String getStaticAccessPath() {

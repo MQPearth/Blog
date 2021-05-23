@@ -10,10 +10,10 @@ import com.zzx.utils.DateUtil;
 import com.zzx.utils.FormatUtil;
 import com.zzx.utils.JwtTokenUtil;
 import com.zzx.utils.RequestUtil;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Service
