@@ -7,13 +7,14 @@
 
 #### 后端
 
-* Springboot
-* Mybatis
+* SpringBoot
+* MyBatis
 * Spring security
 * JWT
 * Redis
 * RabbitMQ
 * Swagger-UI
+* [ip2region](https://github.com/lionsoul2014/ip2region)
 
 #### 项目目录
 
@@ -22,7 +23,6 @@
 * img                                    文档相关图片
 * other                                 其他文档
   * prototype.md		   原型文档
-  * 踩坑整理.docx           写本项目遇到的坑
   * 博客缓存.png            redis博客缓存说明
   * 后端功能说明.png     后端功能说明
 * conf                                   已配置的项目压缩文件
