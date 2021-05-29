@@ -12,6 +12,7 @@ import com.zzx.service.RoleService;
 import com.zzx.service.UserService;
 import com.zzx.utils.DateUtil;
 import com.zzx.utils.FormatUtil;
+import com.zzx.utils.IPUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -363,6 +365,16 @@ public class UserController {
                 new PageResult<>(userService.getUserCountByName(userName), userService.searchUserByName(userName, page, showCount));
 
         return Result.create(StatusCode.OK, "查询成功", pageResult);
+    }
+
+    @ApiOperation(value = "查询ip信息", notes = "查询ip信息")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/ip")
+    public Result ip(String ip) {
+        if (StringUtils.isEmpty(ip)) {
+            return Result.create(StatusCode.ERROR, "ip不能为空");
+        }
+        return Result.create(StatusCode.OK, "查询成功", IPUtil.getCityInfo(ip));
     }
 
 

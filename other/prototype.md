@@ -1,11 +1,11 @@
 ## Blog
 
-1. vue+springboot+mybatis
+1. Vue + Spring Boot + MyBatis
 2. RESTFUL API  
-3. jwt-Spring Security权限管理
-4. swagger
+3. JWT + Spring Security权限管理
+4. Swagger
 5. 前后端分离
-6. mysql
+6. MySQL
 
 ### 原型设计
 

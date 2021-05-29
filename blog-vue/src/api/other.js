@@ -4,7 +4,7 @@ import qs from 'qs';
 export default {
   getIPInfo(ip) {
     return request({
-      url: '/ip',
+      url: '/user/ip',
       method: 'post',
       data: qs.stringify({'ip': ip})
     })

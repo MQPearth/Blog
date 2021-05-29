@@ -178,7 +178,7 @@
         this.loading = true
         other.getIPInfo(ip).then(res => {
           this.loading = false
-          this.$alert('<div>' + res.text.ip2region_location + '</div>', '用户IP来源', {
+          this.$alert('<div>' + res.data + '</div>', '用户IP来源', {
             dangerouslyUseHTMLString: true
           });
         }).catch(res => {
