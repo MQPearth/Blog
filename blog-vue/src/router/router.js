@@ -18,6 +18,7 @@ import userManage from '@/views/userManage'
 import codeManage from '@/views/codeManage'
 import announcementManage from '@/views/announcementManage'
 import blogManage from '@/views/blogManage'
+import logManage from '@/views/logManage'
 
 Vue.use(Router)
 
@@ -72,6 +73,11 @@ export default new Router({
           path: 'blogManage',
           name: 'blogManage',
           component: blogManage
+        },
+        {
+          path: 'logManage',
+          name: 'logManage',
+          component: logManage
         }
       ]
     },

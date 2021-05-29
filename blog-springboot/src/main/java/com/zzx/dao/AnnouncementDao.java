@@ -3,11 +3,13 @@ package com.zzx.dao;
 import com.zzx.model.pojo.Announcement;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * 按代码规范, 此类名应该为AnnouncementDAO, 历史遗留代码, 就不改了
+ */
 @Repository
 @Mapper
 public interface AnnouncementDao {

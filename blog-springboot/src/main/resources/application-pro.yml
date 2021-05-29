@@ -35,6 +35,14 @@ spring:
   #         ssl:
   #            enable: true
 
+  data:
+    mongodb:
+      username: 'log'
+      password: '123456'
+      host: 192.168.125.136
+      port: 27017
+      database: log
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
 
   ###Redis
   redis:

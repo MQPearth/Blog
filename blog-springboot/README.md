@@ -2,17 +2,18 @@
 
 #### 技术栈
 
-* springboot
-* mybatis
-* spring security
-* jwt
-* mysql
-* swagger-ui api
-* springboot-mail
-* druid
-* redis
-* rabbitmq
-* restful api
+* SpringBoot
+* MyBatis
+* Spring Security
+* JWT
+* MySQL
+* Swagger-UI
+* SpringBoot Mail
+* Druid
+* Mongo
+* Redis
+* RabbitMQ
+* RestFul API
 * 前后端分离
 
 #### Tip

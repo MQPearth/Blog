@@ -11,6 +11,7 @@
 * MyBatis
 * Spring security
 * JWT
+* Mongo
 * Redis
 * RabbitMQ
 * Swagger-UI
@@ -34,6 +35,7 @@
 * 主页![主页](img/index_demo.png)
 * 博客 ![博客](img/blog_demo.png)
 * 后台 ![后台](img/admin_demo.png)
+* 实时日志 ![实时日志](img/log.png)
 
 #### docker 部署教程
 [Docker 部署本站 详细全过程 附代码](https://blog.22xcode.com/post/12)
@@ -47,9 +49,6 @@
 
 
 有毕设需求可以联系`1970432392@qq.com`
-
-# 项目停止维护
-
 
 
 

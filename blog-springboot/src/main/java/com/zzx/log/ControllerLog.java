@@ -1,10 +1,10 @@
 package com.zzx.log;
 
-import com.zzx.utils.LoggerUtil;
+import com.zzx.config.RabbitMqConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
-import org.slf4j.Logger;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +23,9 @@ public class ControllerLog {
     @Autowired
     private HttpServletRequest request;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
 
     /**
      * 拦截控制层的所有public方法
@@ -38,6 +41,7 @@ public class ControllerLog {
 
     static {
         PASS_PATH.add("/user/getMailSendState");
+        PASS_PATH.add("/log/findNewestLog");
     }
 
     /**
@@ -55,15 +59,32 @@ public class ControllerLog {
         long start = System.currentTimeMillis();
         Object obj = pjp.proceed();
         long end = System.currentTimeMillis();
+
+        String value = obj == null ? "null" : obj.toString();
+        long time = end - start;
         if (!PASS_PATH.contains(requestUri)) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("{URL:[").append(requestUri).append("],")
-                    .append("RequestMethod:[").append(request.getMethod()).append("],")
-                    .append("Args:").append(Arrays.toString(pjp.getArgs())).append(",")
-                    .append("ReturnValue:[").append(obj == null ? "null" : obj.toString()).append("],")
-                    .append("Time:[").append(end - start).append("ms],")
-                    .append("MethodName:[").append(pjp.getSignature()).append("]}");
-            log.info(builder.toString());
+            String logInfo = "{URL:[" + requestUri + "]," +
+                    "RequestMethod:[" + request.getMethod() + "]," +
+                    "Args:" + Arrays.toString(pjp.getArgs()) + "," +
+                    "ReturnValue:[" + value + "]," +
+                    "Time:[" + time + "ms]," +
+                    "MethodName:[" + pjp.getSignature() + "]}";
+            log.info(logInfo);
+
+            try {
+                com.zzx.model.entity.ControllerLog controllerLog = new com.zzx.model.entity.ControllerLog();
+                controllerLog.setUrl(requestUri);
+                controllerLog.setRequestMethod(request.getMethod());
+                controllerLog.setArgs(Arrays.toString(pjp.getArgs()));
+                controllerLog.setReturnValue(value);
+                controllerLog.setTime(Long.valueOf(time).intValue());
+                controllerLog.setMethodName(pjp.getSignature().toString());
+                controllerLog.setDate(new Date());
+
+                rabbitTemplate.convertAndSend(RabbitMqConfig.CONTROLLER_LOG_QUEUE, controllerLog);
+            } catch (Throwable t) {
+                log.error("日志消息发送失败", t);
+            }
         }
 
         return obj;

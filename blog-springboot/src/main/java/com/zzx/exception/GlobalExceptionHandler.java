@@ -5,6 +5,7 @@ import com.zzx.model.entity.StatusCode;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.firewall.RequestRejectedException;
+import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -70,7 +71,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             MissingServletRequestParameterException.class,
             MethodArgumentTypeMismatchException.class,
-            RequestRejectedException.class}
+            RequestRejectedException.class,
+            BindException.class}
     )
     public Result missingServletRequestParameterException(Exception e) {
 //        e.printStackTrace();
@@ -110,7 +112,7 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(Exception.class)
-    public Result exceptionHander(Exception e) {
+    public Result exceptionHandler(Exception e) {
         e.printStackTrace();
         return Result.create(StatusCode.SERVICEERROR, "服务异常 请联系管理员");
     }

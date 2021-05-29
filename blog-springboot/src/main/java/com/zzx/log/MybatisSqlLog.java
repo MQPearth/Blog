@@ -1,6 +1,7 @@
 package com.zzx.log;
 
-import com.zzx.utils.LoggerUtil;
+import com.zzx.config.RabbitMqConfig;
+import com.zzx.model.entity.SqlLog;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
@@ -12,12 +13,8 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.TypeHandlerRegistry;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
-import org.slf4j.Logger;
-import org.springframework.cglib.core.CollectionUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
@@ -36,6 +33,9 @@ import java.util.regex.Matcher;
 @Component
 @Slf4j
 public class MybatisSqlLog implements Interceptor {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
     @Override
@@ -60,13 +60,21 @@ public class MybatisSqlLog implements Interceptor {
         // 获取到最终的sql语句
         String sql = showSql(configuration, boundSql);
 
+        String logInfo = "{SQL:[" + sql + "]," +
+                "Time:[" + time + "ms]}";
         //sql执行耗时100ms以上时警告
         if (time > 100) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("{SQL:[").append(sql).append("],")
-                    .append("Time:[").append(time).append("ms]}");
-            log.warn(builder.toString());
+            log.warn(logInfo.toString());
         }
+        try {
+            SqlLog sqlLog = new SqlLog(sql);
+            sqlLog.setTime(Long.valueOf(time).intValue());
+            sqlLog.setDate(new Date());
+            rabbitTemplate.convertAndSend(RabbitMqConfig.SQL_LOG_QUEUE, sqlLog);
+        } catch (Throwable t) {
+            log.error("日志消息发送失败", t);
+        }
+
         // 执行完上面的任务后，不改变原有的sql执行过程
         return proceed;
     }

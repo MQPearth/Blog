@@ -39,7 +39,32 @@ function timeago(timestamp) { //将时间转化成离现在几分钟，几小时
   }
 }
 
+function format(date) {
+
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  let hours = date.getHours();
+  if (hours < 10)
+    hours = '0' + hours;
+  let minutes = date.getMinutes();
+  if (minutes < 10)
+    minutes = '0' + minutes;
+  let seconds = date.getSeconds();
+  if (seconds < 10)
+    seconds = '0' + seconds;
+  let ms = date.getMilliseconds();
+  if (ms < 10) {
+    ms = '00' + ms;
+  } else if (ms < 100) {
+    ms = '0' + ms;
+  }
+
+  return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds + ':' + ms;
+}
+
 
 export default {
-  timeago
+  timeago,
+  format
 }

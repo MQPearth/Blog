@@ -62,4 +62,13 @@ public class BeanConfig {
     }
 
 
+    @Bean
+    public Queue controllerLogQueue() {
+        return new Queue(RabbitMqConfig.CONTROLLER_LOG_QUEUE);
+    }
+
+    @Bean
+    public Queue sqlLogQueue() {
+        return new Queue(RabbitMqConfig.SQL_LOG_QUEUE);
+    }
 }
