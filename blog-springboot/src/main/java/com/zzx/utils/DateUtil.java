@@ -30,23 +30,24 @@ public class DateUtil {
     public String printDate() {
         Date currentTime = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateString = formatter.format(currentTime);
-        return dateString;
+        return formatter.format(currentTime);
     }
 
     /**
      * 输入年-月-日  转化为date类型
-     **/
+     */
     public Date calendarToData(int year, int month, int day) {
-        Calendar calendar = Calendar.getInstance();//日历类的实例化
-        calendar.set(year, month - 1, day);//设置日历时间，月份必须减一
-        Date date = calendar.getTime(); // 从一个 Calendar 对象中获取 Date 对象
-        return date;
+        //日历类的实例化
+        Calendar calendar = Calendar.getInstance();
+        //设置日历时间，月份必须减一
+        calendar.set(year, month - 1, day);
+        // 从一个 Calendar 对象中获取 Date 对象
+        return calendar.getTime();
     }
 
     /**
      * 获得一个 Date 对象实例
-     **/
+     */
     public Calendar dataToCalendar(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -223,7 +224,7 @@ public class DateUtil {
      * @param pattern
      * @return
      */
-    public String DateToString(Date source, String pattern) {
+    public String dateToString(Date source, String pattern) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         return simpleDateFormat.format(source);
     }
