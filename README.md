@@ -52,10 +52,3 @@
 有毕设需求可以联系 `1970432392@qq.com`
 
 
-
-
-[JetBrains Open Source License](https://www.jetbrains.com/?from=Blog)
-
-<div align="left">
-<img src="img/jetbrains-training-partner.png"  height="150" width="150">
-</div>
