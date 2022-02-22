@@ -457,12 +457,19 @@ public class UserService implements UserDetailsService {
     /**
      * 校验验证码是否正确
      *
+     * 将Redis的key值 mailCode_State 的mailCode解析出来
+     *
+     * @author: zzguo
      * @param mail
      * @param code
      * @return
      */
     public boolean checkMailCode(String mail, String code) {
-        String mailCode = getMailCodeFromRedis(mail);
+        // PS: mailCode_State
+        String mailCodeState = getMailCodeFromRedis(mail);
+        // mailCodeArr[0] = mailCode; mailCodeArr[1] = State
+        String[] mailCodeArr = mailCodeState.split("_");
+        String mailCode = mailCodeArr[0];
 
         if (code.equals(mailCode)) {
             return true;
