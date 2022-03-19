@@ -146,6 +146,7 @@
 
     <select id="statisticalBlogByMonth" parameterType="Integer" resultType="Map">
         SELECT YEAR(blog_time) year, MONTH(blog_time) month,COUNT(1) count FROM blog
+        WHERE blog_state = 1
         GROUP BY YEAR(blog_time),MONTH(blog_time)
         ORDER by blog_time DESC
         LIMIT 0,#{value}
