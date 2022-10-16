@@ -23,7 +23,7 @@ public class AnnouncementController {
     private FormatUtil formatUtil;
 
 
-    @ApiOperation(value = "不发布", notes = "公告标题+公告内容")
+    @ApiOperation(value = "发布", notes = "公告标题+公告内容")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public Result newAnnouncement(String title, String body) {
