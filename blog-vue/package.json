@@ -22,7 +22,7 @@
     "vue-cookies": "^1.5.13",
     "vue-router": "^3.0.1",
     "vuex": "^3.1.1",
-    "webpack-dev-server": "^2.9.1"
+    "webpack-dev-server": "^4.13.3"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
