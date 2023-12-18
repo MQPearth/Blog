@@ -67,36 +67,62 @@
 
     <el-divider/>
 
-    <div id="updateReward">
+    <div id="updateRewardDiv">
       <div>
-        <h3>更新打赏码</h3>
-        <el-form ref="form" label-width="100px">
-          <el-form-item label="当前打赏码">
-            <el-image v-if="userReward!==''"
-                      style="width: 200px; height: 200px"
-                      :src="userReward"
-                      :fit="'fit'"/>
-            <span v-if="userReward===''">暂无</span>
-          </el-form-item>
+        <el-tabs v-model="activeName" @tab-click="tabsHandleClick">
+          <el-tab-pane label="更新打赏码" name="updateRewardTab">
+            <el-form ref="form" label-width="100px">
+              <el-form-item label="当前打赏码">
+                <el-image v-if="userReward!==''"
+                          style="width: 200px; height: 200px"
+                          :src="userReward"
+                          :fit="'fit'"/>
+                <span v-if="userReward===''">暂无</span>
+              </el-form-item>
 
-          <el-form-item label="更新打赏码">
-            <el-upload
-              class="avatar-uploader"
-              :action="upload"
-              :headers="getToken()"
-              :on-success="handleAvatarSuccess"
-              :show-file-list="false"
-              :before-upload="beforeAvatarUpload">
-              <img v-if="imageUrl" :src="imageUrl" class="avatar">
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            </el-upload>
-          </el-form-item>
+              <el-form-item label="更新打赏码">
+                <el-upload
+                  class="avatar-uploader"
+                  :action="upload"
+                  :headers="getToken()"
+                  :on-success="handleAvatarRewardSuccess"
+                  :show-file-list="false"
+                  :before-upload="beforeAvatarUpload">
+                  <img v-if="userRewardimageUrl" :src="userRewardimageUrl" class="avatar">
+                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+              </el-form-item>
+            </el-form>
+          </el-tab-pane>
+          <el-tab-pane label="更新头像" name="updateIconTab">
+            <el-form ref="form" label-width="100px">
+              <el-form-item label="当前头像">
+                <el-image v-if="userIcon!==''"
+                          style="width: 200px; height: 200px"
+                          :src="userIcon"
+                          :fit="'fit'"/>
+                <span v-if="userIcon===''">暂无</span>
+              </el-form-item>
 
-
-        </el-form>
+              <el-form-item label="更新头像">
+                <el-upload
+                  class="avatar-uploader"
+                  :action="upload"
+                  :headers="getToken()"
+                  :on-success="handleAvatarIconSuccess"
+                  :show-file-list="false"
+                  :before-upload="beforeAvatarUpload">
+                  <img v-if="userIconimageUrl" :src="userIconimageUrl" class="avatar">
+                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+              </el-form-item>
+            </el-form>
+          </el-tab-pane>
+        </el-tabs>
+        
       </div>
       <div style="margin-left: 45%">
-        <el-button icon="el-icon-orange" @click="updateReward()">更新</el-button>
+        <el-button icon="el-icon-orange" @click="updateUserUrl()">更新</el-button>
       </div>
     </div>
 
@@ -111,6 +137,7 @@
     name: 'account',
     data() {
       return {
+        activeName: 'updateRewardTab',
         oldPassword: '',
         newPassword: '',
         confirmPassword: '',
@@ -122,8 +149,10 @@
         updatePwdSendFlag: false,
         updateMailToOldSendFlag: false,
         updateMailToNewSendFlag: false,
-        imageUrl: '',
+        userRewardimageUrl: '',
         userReward: '',
+        userIconimageUrl: '',
+        userIcon: '',
         upload: '/api/blog/uploadImg'
       }
     },
@@ -131,6 +160,9 @@
       this.load();
     },
     methods: {
+      tabsHandleClick(tab, event) {
+        //console.log(tab, event);
+      },
       load() {
         user.getUserMail().then(res => {
           this.mail = res.data;
@@ -143,15 +175,29 @@
             this.userReward = res.data;
           }
         })
+        user.getUserIcon().then(res => {
+          if (res.data === undefined) {
+            this.userIcon = '';
+          } else {
+            this.userIcon = res.data;
+          }
+        })
       },
       getToken() {
         return {'Authorization': this.$store.state.token}
       },
-      updateReward() {
-        if (this.imageUrl === '')
+      updateUserUrl() {
+        if (this.userRewardimageUrl === '' && this.userIconimageUrl === ''){
+          this.$message({
+            message: '您还没上传需要更新的内容',
+            type: 'error'
+          });
           return;
-
-        user.updateReward(this.imageUrl).then(res => {
+        }
+          
+        user.updateUserUrl(this.userRewardimageUrl, this.userIconimageUrl).then(res => {
+          console.log(res);
+          this.$store.commit('updateIcon', res.data.icon)//更新用户头像
           this.$message({
             message: res.message,
             type: 'success'
@@ -161,8 +207,11 @@
 
 
       },
-      handleAvatarSuccess(res, file) {
-        this.imageUrl = res.data;
+      handleAvatarRewardSuccess(res, file) {
+        this.userRewardimageUrl = res.data;
+      },
+      handleAvatarIconSuccess(res, file) {
+        this.userIconimageUrl = res.data;
       },
       beforeAvatarUpload(file) {
         const isJPG = file.type === 'image/jpeg';
@@ -320,6 +369,8 @@
   #account {
     margin: 1% 5%;
     text-align: left;
+    margin-top: 81px;
+    margin-bottom: 40px;
   }
 
   #updatePwd {
@@ -332,7 +383,7 @@
     width: 30%;
   }
 
-  #updateReward {
+  #updateRewardDiv {
     padding-left: 30%;
     width: 30%;
   }

@@ -28,7 +28,10 @@
 
         <span class="el-icon-chat-line-square hidden-xs-only" style="width: 10%">&nbsp;{{discussCount}}</span>
 
-        <span class="el-icon-user-solid hidden-xs-only" style="width: 10%;text-align: center;">
+        <span class="hidden-xs-only" style="width: 10%;text-align: center;">
+          <el-avatar id="blogUserIcon" size="small" :src="icon" @error="errorHandler">
+            <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"/>
+          </el-avatar>
           &nbsp;{{name}}
         </span>
 
@@ -49,13 +52,16 @@
 
   export default {
     name: 'blogOverView',
-    props: ['id', 'title', 'body', 'time', 'blogViews', 'discussCount', 'tags', 'name'],
+    props: ['id', 'title', 'body', 'time', 'blogViews', 'discussCount', 'tags', 'name', 'icon'],
     data() {
       return {
         show: false
       }
     },
     methods: {
+      errorHandler() {
+        return true
+      },
       router(id) {
         scrollTo(0, 0);
         this.$router.push({ //路由跳转
@@ -106,12 +112,34 @@
       },
       bodyTran(body) { //将数据库中带标签的博文转换为纯文本
 
-        var dd = body.replace(new RegExp('#', 'g'), "");
+        var dd = body.replace(new RegExp('###### ', 'g'), "");
         dd = dd.replace(new RegExp('!\\[.*\\]\\(.*\\)', 'g'), "[图片]");
         dd = dd.replace(new RegExp('\\[.*\\]\\(.*\\)', 'g'), "[链接]");
+        dd = dd.replace(new RegExp('hljs-center', 'g'), "");
+        dd = dd.replace(new RegExp('hljs-left', 'g'), "");
+        dd = dd.replace(new RegExp('hljs-right', 'g'), "");
+        dd = dd.replace(new RegExp('##### ', 'g'), "");
+        dd = dd.replace(new RegExp('#### ', 'g'), "");
+        dd = dd.replace(new RegExp('### ', 'g'), "");
+        dd = dd.replace(new RegExp('## ', 'g'), "");
+        dd = dd.replace(new RegExp('# ', 'g'), "");
+        dd = dd.replace(new RegExp('\\++', 'g'), "");
+        dd = dd.replace(new RegExp('\\~~', 'g'), "");
+        dd = dd.replace(new RegExp('\\==', 'g'), "");
+        dd = dd.replace(new RegExp('\\^', 'g'), "");
+        dd = dd.replace(new RegExp('\\~', 'g'), "");
+        dd = dd.replace(new RegExp('\\> ', 'g'), "");
+        dd = dd.replace(new RegExp('0-9.{1} ', 'g'), "");
+        dd = dd.replace(new RegExp('\\- ', 'g'), "");
+
         dd = dd.replace(new RegExp('-', 'g'), "");
         dd = dd.replace(new RegExp('>', 'g'), "");
+        dd = dd.replace(new RegExp('```language', 'g'), "[代码块]");
         dd = dd.replace(new RegExp('`', 'g'), "");
+        
+        dd = dd.replace(new RegExp('\\*', 'g'), "");
+        dd = dd.replace(new RegExp('\\:::', 'g'), "");
+        dd = dd.replace(new RegExp('\\::', 'g'), "");
         return dd;
       },
       editBlog(id) {
@@ -149,5 +177,10 @@
 
   a {
     text-decoration: none;
+  }
+  #blogUserIcon {
+    position: relative;
+    top: 6px;
+    margin-left: 0px;
   }
 </style>

@@ -11,13 +11,14 @@
         <result property="password" column="user_password"/>
         <result property="mail" column="user_mail"/>
         <result property="reward" column="user_reward"/>
+        <result property="icon" column="user_icon"/>
         <result property="state" column="user_state"/>
         <result property="login.ip" column="login_ip"/>
         <result property="login.time" column="login_time"/>
     </resultMap>
 
     <select id="findUserByName" parameterType="String" resultMap="User">
-        SELECT user_id , user_name,user_password,user_mail,user_state,user_reward
+        SELECT user_id , user_name,user_password,user_mail,user_state,user_reward,user_icon
         from user
         WHERE user_name = #{value}
     </select>
@@ -46,13 +47,13 @@
     </select>
 
     <select id="findUser" resultMap="User">
-        SELECT u.user_id,user_name,user_mail,user_state,user_reward,l.login_ip,l.login_time
+        SELECT u.user_id,user_name,user_mail,user_state,user_reward,user_icon,l.login_ip,l.login_time
         FROM user u LEFT JOIN login l on u.user_id = l.user_id
         LIMIT #{start},#{showCount}
     </select>
 
     <select id="searchUserByName" resultMap="User">
-        SELECT u.user_id,user_name,user_mail,user_state,user_reward,l.login_ip,l.login_time
+        SELECT u.user_id,user_name,user_mail,user_state,user_reward,user_icon,l.login_ip,l.login_time
         FROM user u LEFT JOIN login l on u.user_id = l.user_id
         WHERE user_name LIKE '%${userName}%'
         LIMIT #{start},#{showCount}
@@ -82,6 +83,9 @@
             </if>
             <if test="reward!=null">
                 user_reward = #{reward},
+            </if>
+            <if test="icon!=null">
+                user_icon = #{icon},
             </if>
         </set>
         WHERE user_id = #{id}

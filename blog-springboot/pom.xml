@@ -117,6 +117,13 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
+        <!-- 添加 Apache Commons Pool 依赖 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>2.9.0</version> <!-- 请使用最新版本 -->
+        </dependency>
+
     </dependencies>
 
     <build>

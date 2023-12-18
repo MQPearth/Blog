@@ -9,6 +9,7 @@ import com.zzx.dao.BlogDao;
 import com.zzx.dao.RoleDao;
 import com.zzx.dao.TagDao;
 import com.zzx.dao.UserDao;
+import com.zzx.enums.BlogTabelEnum;
 import com.zzx.model.pojo.Blog;
 import com.zzx.model.pojo.User;
 import com.zzx.schedule.BlogTask;
@@ -153,7 +154,12 @@ public class BlogService {
         blog.setTime(dateUtil.getCurrentDate());
         blogDao.saveBlog(blog);
 
+        boolean saveBugTag = false;
         for (Integer tagId : tagIds) {
+            int count = blogDao.findBlogTagById(tagId);
+            if (count > 0) {
+                saveBugTag = true;
+            }
             //保存该博文的标签
             blogDao.saveBlogTag(blog.getId(), tagId);
         }
@@ -165,12 +171,19 @@ public class BlogService {
         if (redisTemplate.opsForList().size(RedisConfig.REDIS_NEW_BLOG) >= RedisConfig.REDIS_NEW_BLOG_COUNT) {
             redisTemplate.opsForList().rightPop(RedisConfig.REDIS_NEW_BLOG);
         }
+        if (saveBugTag && redisTemplate.opsForList().size(RedisConfig.REDIS_BUG_BLOG) >= RedisConfig.REDIS_BUG_BLOG_COUNT) {
+            redisTemplate.opsForList().rightPop(RedisConfig.REDIS_BUG_BLOG);
+        }
 
 
         // 获取标签名
         blog.setTags(tagDao.findTagByBlogId(blog.getId()));
         // 存入newblog 的左边第一位
         redisTemplate.opsForList().leftPush(RedisConfig.REDIS_NEW_BLOG, blog.getId().toString());
+        // 存入bugblog 的左边第一位
+        if (saveBugTag) {
+            redisTemplate.opsForList().leftPush(RedisConfig.REDIS_BUG_BLOG, blog.getId().toString());
+        }
         // user隐藏相关字段
         blog.getUser().setPassword(null);
         blog.getUser().setMail(null);
@@ -265,6 +278,16 @@ public class BlogService {
     }
 
     /**
+     * 查询BUG页所有博客数量
+     * 正常状态
+     *
+     * @return
+     */
+    public Long getBugBlogCount() {
+        return blogDao.getBugBlogCount();
+    }
+
+    /**
      * 查询主页博客
      * 正常状态
      *
@@ -272,24 +295,43 @@ public class BlogService {
      * @param showCount 显示条数
      * @return
      */
-    public List<Blog> findHomeBlog(Integer page, Integer showCount) throws IOException {
+    public List<Blog> findTabelBlog(Integer page, Integer showCount, BlogTabelEnum tabelEnum) throws IOException {
 
         // mysql 分页中的开始位置
         int start = (page - 1) * showCount;
 
-        //没有缓存 需查询mysql 设置缓存
-        if (!redisTemplate.hasKey(RedisConfig.REDIS_NEW_BLOG)) {
+        if (tabelEnum == BlogTabelEnum.BUG){
+            //没有缓存 需查询mysql 设置缓存
+            if (!redisTemplate.hasKey(RedisConfig.REDIS_BUG_BLOG)) {
 
-            List<Blog> blogsFromMysql = blogDao.findHomeBlog(0, RedisConfig.REDIS_NEW_BLOG_COUNT);
-            for (Blog blog : blogsFromMysql) {
+                List<Blog> blogsFromMysql;
+                blogsFromMysql = blogDao.findBugBlog(0, RedisConfig.REDIS_BUG_BLOG_COUNT);
+                for (Blog blog : blogsFromMysql) {
 
-                blog.setTags(tagDao.findTagByBlogId(blog.getId()));
-                String blogId = Integer.toString(blog.getId());
+                    blog.setTags(tagDao.findTagByBlogId(blog.getId()));
+                    String blogId = Integer.toString(blog.getId());
 
-                redisTemplate.opsForList().rightPush(RedisConfig.REDIS_NEW_BLOG, blogId);
-                redisTemplate.opsForValue().set(RedisConfig.REDIS_BLOG_PREFIX + blogId, objectMapper.writeValueAsString(blog));
+                    redisTemplate.opsForList().rightPush(RedisConfig.REDIS_BUG_BLOG, blogId);
+                    redisTemplate.opsForValue().set(RedisConfig.REDIS_BLOG_PREFIX + blogId, objectMapper.writeValueAsString(blog));
+                }
+            }
+        } else {
+            //没有缓存 需查询mysql 设置缓存
+            if (!redisTemplate.hasKey(RedisConfig.REDIS_NEW_BLOG)) {
+
+                List<Blog> blogsFromMysql;
+                blogsFromMysql = blogDao.findHomeBlog(0, RedisConfig.REDIS_NEW_BLOG_COUNT);
+                for (Blog blog : blogsFromMysql) {
+
+                    blog.setTags(tagDao.findTagByBlogId(blog.getId()));
+                    String blogId = Integer.toString(blog.getId());
+
+                    redisTemplate.opsForList().rightPush(RedisConfig.REDIS_NEW_BLOG, blogId);
+                    redisTemplate.opsForValue().set(RedisConfig.REDIS_BLOG_PREFIX + blogId, objectMapper.writeValueAsString(blog));
+                }
             }
         }
+
 
         // 返回的blog列表
         List<Blog> blogs = new LinkedList<>();
@@ -299,35 +341,66 @@ public class BlogService {
         //          limit 10,10 10+10=20
         //          limit 6,5 6+5=11
 
-        if (start >= RedisConfig.REDIS_NEW_BLOG_COUNT) {
-            // 开始位置大于缓存数量 即查询范围不在缓存内 查询mysql 且不设置缓存
-            blogs.addAll(blogDao.findHomeBlog(start, showCount));
-            for (Blog blog : blogs) {
+        if (tabelEnum == BlogTabelEnum.BUG){
+            if (start >= RedisConfig.REDIS_BUG_BLOG_COUNT) {
+                // 开始位置大于缓存数量 即查询范围不在缓存内 查询mysql 且不设置缓存
+                blogs.addAll(blogDao.findBugBlog(start, showCount));
 
-                blog.setTags(tagDao.findTagByBlogId(blog.getId()));
+                for (Blog blog : blogs) {
+                    blog.setTags(tagDao.findTagByBlogId(blog.getId()));
+                }
+
+            } else if (start + showCount > RedisConfig.REDIS_BUG_BLOG_COUNT) {
+                // 查询范围部分在缓存内
+                List<String> redisBlogIds = redisTemplate.opsForList().range(RedisConfig.REDIS_BUG_BLOG, start, RedisConfig.REDIS_BUG_BLOG_COUNT - 1);
+                for (String blogId : redisBlogIds) {
+                    String blogJson = redisTemplate.opsForValue().get(RedisConfig.REDIS_BLOG_PREFIX + blogId);
+                    Blog blog = objectMapper.readValue(blogJson, Blog.class);
+                    blogs.add(blog);
+                }
+                blogs.addAll(blogDao.findBugBlog(RedisConfig.REDIS_BUG_BLOG_COUNT, showCount - (RedisConfig.REDIS_BUG_BLOG_COUNT - start)));
+            } else {
+                // 查询范围全在缓存
+                List<String> redisBlogIds = redisTemplate.opsForList().range(RedisConfig.REDIS_BUG_BLOG, start, start - 1 + showCount);
+                for (String blogId : redisBlogIds) {
+                    String blogJson = redisTemplate.opsForValue().get(RedisConfig.REDIS_BLOG_PREFIX + blogId);
+                    Blog blog = objectMapper.readValue(blogJson, Blog.class);
+                    blogs.add(blog);
+                }
 
             }
-
-        } else if (start + showCount > RedisConfig.REDIS_NEW_BLOG_COUNT) {
-            // 查询范围部分在缓存内
-            List<String> redisBlogIds = redisTemplate.opsForList().range(RedisConfig.REDIS_NEW_BLOG, start, RedisConfig.REDIS_NEW_BLOG_COUNT - 1);
-            for (String blogId : redisBlogIds) {
-                String blogJson = redisTemplate.opsForValue().get(RedisConfig.REDIS_BLOG_PREFIX + blogId);
-                Blog blog = objectMapper.readValue(blogJson, Blog.class);
-                blogs.add(blog);
-            }
-            blogs.addAll(blogDao.findHomeBlog(RedisConfig.REDIS_NEW_BLOG_COUNT, showCount - (RedisConfig.REDIS_NEW_BLOG_COUNT - start)));
-
         } else {
-            // 查询范围全在缓存
-            List<String> redisBlogIds = redisTemplate.opsForList().range(RedisConfig.REDIS_NEW_BLOG, start, start - 1 + showCount);
-            for (String blogId : redisBlogIds) {
-                String blogJson = redisTemplate.opsForValue().get(RedisConfig.REDIS_BLOG_PREFIX + blogId);
-                Blog blog = objectMapper.readValue(blogJson, Blog.class);
-                blogs.add(blog);
-            }
+            if (start >= RedisConfig.REDIS_NEW_BLOG_COUNT) {
+                // 开始位置大于缓存数量 即查询范围不在缓存内 查询mysql 且不设置缓存
+                blogs.addAll(blogDao.findHomeBlog(start, showCount));
 
+                for (Blog blog : blogs) {
+
+                    blog.setTags(tagDao.findTagByBlogId(blog.getId()));
+
+                }
+
+            } else if (start + showCount > RedisConfig.REDIS_NEW_BLOG_COUNT) {
+                // 查询范围部分在缓存内
+                List<String> redisBlogIds = redisTemplate.opsForList().range(RedisConfig.REDIS_NEW_BLOG, start, RedisConfig.REDIS_NEW_BLOG_COUNT - 1);
+                for (String blogId : redisBlogIds) {
+                    String blogJson = redisTemplate.opsForValue().get(RedisConfig.REDIS_BLOG_PREFIX + blogId);
+                    Blog blog = objectMapper.readValue(blogJson, Blog.class);
+                    blogs.add(blog);
+                }
+                blogs.addAll(blogDao.findHomeBlog(RedisConfig.REDIS_NEW_BLOG_COUNT, showCount - (RedisConfig.REDIS_NEW_BLOG_COUNT - start)));
+            } else {
+                // 查询范围全在缓存
+                List<String> redisBlogIds = redisTemplate.opsForList().range(RedisConfig.REDIS_NEW_BLOG, start, start - 1 + showCount);
+                for (String blogId : redisBlogIds) {
+                    String blogJson = redisTemplate.opsForValue().get(RedisConfig.REDIS_BLOG_PREFIX + blogId);
+                    Blog blog = objectMapper.readValue(blogJson, Blog.class);
+                    blogs.add(blog);
+                }
+
+            }
         }
+
 
         // 截取前150个字符 减少网络io
         for (Blog blog : blogs) {
@@ -473,6 +546,7 @@ public class BlogService {
         if (redisTemplate.hasKey(RedisConfig.REDIS_BLOG_PREFIX + blogId)) {
             // 更新最新博客列表
             blogTask.updateRedisNewBlogList();
+            blogTask.updateRedisBugBlogList(blogId);
 
         }
         // 删除博客归档信息
@@ -499,6 +573,7 @@ public class BlogService {
         if (redisTemplate.hasKey(RedisConfig.REDIS_BLOG_PREFIX + blogId)) {
             List<String> newBlogIds = redisTemplate.opsForList().range(RedisConfig.REDIS_NEW_BLOG, 0, RedisConfig.REDIS_NEW_BLOG_COUNT - 1);
             List<String> hotBlogIds = redisTemplate.opsForList().range(RedisConfig.REDIS_HOT_BLOG, 0, RedisConfig.REDIS_HOT_BLOG_COUNT - 1);
+            List<String> bugBlogIds = redisTemplate.opsForList().range(RedisConfig.REDIS_BUG_BLOG, 0, RedisConfig.REDIS_BUG_BLOG_COUNT - 1);
 
 
             if (newBlogIds.contains(blogId + "")) {
@@ -509,6 +584,11 @@ public class BlogService {
             if (hotBlogIds.contains(blogId + "")) {
                 // 更新热门博客列表
                 blogTask.updateRedisHotBlogList();
+            }
+
+            if (bugBlogIds.contains(blogId + "")) {
+                // 更新BUG博客列表
+                blogTask.updateRedisBugBlogList(blogId);
             }
         }
         // 删除博客归档信息

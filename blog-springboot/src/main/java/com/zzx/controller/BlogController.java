@@ -2,6 +2,7 @@ package com.zzx.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zzx.config.RedisConfig;
+import com.zzx.enums.BlogTabelEnum;
 import com.zzx.model.entity.PageResult;
 import com.zzx.model.entity.Result;
 import com.zzx.model.entity.StatusCode;
@@ -138,7 +139,35 @@ public class BlogController {
 
 
         try {
-            PageResult<Blog> pageResult = new PageResult<>(blogService.getHomeBlogCount(), blogService.findHomeBlog(page, showCount));
+            PageResult<Blog> pageResult = new PageResult<>(blogService.getHomeBlogCount(), blogService.findTabelBlog(page, showCount, BlogTabelEnum.ALL));
+            return Result.create(StatusCode.OK, "查询成功", pageResult);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Result.create(StatusCode.SERVICEERROR, "服务异常");
+        }
+
+
+    }
+
+    /**
+     * Bug页分页查询
+     * 查询的范围在 最近10条博客 内
+     * tip：tag标签有BUG标签时，才能查询成功，后续可修改为类型
+     *
+     * @param page      页码
+     * @param showCount 显示条数
+     * @return
+     */
+    @ApiOperation(value = "Bug页分页查询博文", notes = "页数+显示数量")
+    @GetMapping("/bug/{page}/{showCount}")
+    public Result bugBlog(@PathVariable Integer page, @PathVariable Integer showCount) {
+        if (!formatUtil.checkPositive(page, showCount) || showCount > RedisConfig.REDIS_NEW_BLOG_COUNT) {
+            return Result.create(StatusCode.OK, "参数错误");
+        }
+
+
+        try {
+            PageResult<Blog> pageResult = new PageResult<>(blogService.getBugBlogCount(), blogService.findTabelBlog(page, showCount, BlogTabelEnum.BUG));
             return Result.create(StatusCode.OK, "查询成功", pageResult);
         } catch (IOException e) {
             e.printStackTrace();
