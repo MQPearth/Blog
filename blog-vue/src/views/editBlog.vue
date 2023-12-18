@@ -1,5 +1,6 @@
 <template>
   <div id="editBlog">
+    <el-link :underline="false"  @click="goBack()"><i class="el-icon-back">Back</i></el-link>
     <!--为了blogId值改变事件会被watch到-->
     <p style="display: none">{{blogId = this.$route.params.blogId}}</p>
 
@@ -20,7 +21,7 @@
 
     <el-card id="tags">
       <div>
-        <p class="el-icon-mouse">选择一个以上标签</p>
+        <p class="el-icon-mouse">选择一个以上标签(没有合适的标签?<el-button type="text" @click="addTag">点此新增标签</el-button>)</p>
         <el-checkbox-group v-model="checkboxGroup">
           <el-checkbox v-for="tag in tags" :key="tag.id" :label="tag.id" border
                        style="margin-top: 10px">
@@ -75,6 +76,15 @@
       }
     },
     methods: {
+      goBack() {
+        history.back()
+      },
+      //加载标签列表
+      loadTags() {
+        tag.getTag().then(res => {
+          this.tags = res.data;
+        })
+      },
       editBlog() { //更改博客
         if (this.checkboxGroup.length <= 0 || this.title.length <= 0 || this.body.length <= 0) {
           this.$message({
@@ -122,13 +132,42 @@
         if (this.title.length > 0 && this.body.length > 0) {
           file.generateTxt(this.title, this.body + '\n' + new Date().toLocaleString());
         }
-      }
+      },
+      addTag() {
+        this.$prompt('请输入新标签名', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(({value}) => {
+          if (value == null || value.length <= 0) {
+            this.$message({
+              type: 'error',
+              message: '字段不完整'
+            });
+            return;
+          }
+          tag.addTag(value).then(res => {
+            if (res.code == 200) {
+              this.loadTags();
+              this.$message({
+                type: 'success',
+                message: '新增成功'
+              });
+            }else {
+              this.$message({
+                type: 'error',
+                message: '新增失败'
+              });
+            }
+          })
+        })
+      },
     }
   }
 </script>
 <style>
   #editBlog {
     margin: 20px 5% 0 5%;
+    margin-top: 81px;
   }
 
   #tags {
@@ -137,6 +176,7 @@
 
   #editor {
     height: 600px;
+    position: inherit;
   }
 
   .el-checkbox__input.is-checked + .el-checkbox__label {

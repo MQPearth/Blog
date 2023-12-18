@@ -16,8 +16,10 @@
 
 
           <div style="width: 20%;float: left;margin: 10px 2% 0px -5%" class="hidden-xs-only">
-            <el-input placeholder="搜索博客" v-model="searchTxt" suffix-icon="el-icon-search"
-                      @keyup.enter.native="searchSubmit"/>
+            <el-input placeholder="搜索博客" v-model="searchTxt"
+                      @keyup.enter.native="searchSubmit">
+              <i slot="suffix" class="el-input__icon el-icon-search" @click="searchSubmit"></i>
+            </el-input>
           </div>
 
 
@@ -84,7 +86,7 @@
 
 
           <el-submenu class="hidden-xs-only" index="4" v-if="this.$store.state.token!==''" :router="true">
-            <template slot="title">[&nbsp;&nbsp;{{this.$store.state.name}}&nbsp;&nbsp;]</template>
+            <template slot="title">欢迎回来，尊敬的&nbsp;&nbsp;{{this.$store.state.name}}&nbsp;&nbsp;</template>
 
             <el-menu-item route="/newBlog" index="4-1">&nbsp;&nbsp;&nbsp;
               <i class="el-icon-edit"></i>
@@ -288,19 +290,34 @@
 
       },
       searchSubmit() {
-        if (this.searchTxt.length <= 0)
+        console.log(this.searchTxt.length);
+        if (this.searchTxt.length < 0){
           return;
-        this.$router.push({ //路由跳转
-          path: '/searchBlog/' + this.searchTxt
-        })
-        this.searchTxt = '';//清空搜索框
+        }
+        if(this.searchTxt.length == 0){
+          console.log("t");
+          this.$router.push({ //路由跳转
+            path: '/'
+          })
+        }else {
+          this.$router.push({ //路由跳转
+            path: '/searchBlog/' + this.searchTxt
+          })
+          this.searchTxt = '';//清空搜索框
+          this.$message({
+            message: '搜索成功',
+            type: 'success',
+            duration: 800
+          })
+        }
+        
       }
     }
   }
 </script>
 <style>
   #bar {
-    margin-top: -50px;
+    margin-top: 0px;
     margin-bottom: 0px;
   }
 

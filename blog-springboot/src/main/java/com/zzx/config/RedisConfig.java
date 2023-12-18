@@ -29,6 +29,15 @@ public class RedisConfig {
     public static final String REDIS_NEW_BLOG = "NEWBLOG";
 
     /**
+     * redis中存放 BUG页 的 key
+     */
+    public static final String REDIS_BUG_BLOG = "BUGBLOG";
+
+    /**
+     * redis中存放 最新博客 数量 的最大值
+     */
+    public static final int REDIS_BUG_BLOG_COUNT = 10;
+    /**
      * redis中存放blog的前缀
      */
     public static final String REDIS_BLOG_PREFIX = "BLOG_";

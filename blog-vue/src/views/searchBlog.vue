@@ -7,7 +7,7 @@
                     :body="blog.body" :time="getTime(blog.time)"
                     :blogViews="blog.blogViews"
                     :discussCount="blog.discussCount" :tags="catchTagName(blog.tags)"
-                    :name="blog.user.name"/>
+                    :name="blog.user.name" :icon="blog.user.icon"/>
     </div>
 
     <div v-if="loading" style="margin: 35% 0">
@@ -80,6 +80,8 @@
 <style scoped>
   #searchBlogList {
     text-align: center;
-    margin: -13px 5% 0 5%;
+    /* margin: 13px 5% 0 5%; */
+    margin: 20px 5% 0 5%;
+    padding: 20px;
   }
 </style>
