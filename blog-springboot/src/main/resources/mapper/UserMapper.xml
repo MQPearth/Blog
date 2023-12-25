@@ -54,7 +54,7 @@
     <select id="searchUserByName" resultMap="User">
         SELECT u.user_id,user_name,user_mail,user_state,user_reward,l.login_ip,l.login_time
         FROM user u LEFT JOIN login l on u.user_id = l.user_id
-        WHERE user_name LIKE '%${userName}%'
+        WHERE user_name LIKE CONCAT('%', #{userName}, '%')
         LIMIT #{start},#{showCount}
     </select>
 
@@ -62,7 +62,7 @@
     <select id="getUserCountByName" parameterType="String" resultType="Long">
         SELECT COUNT(1)
         FROM user
-        WHERE user_name LIKE '%${value}%'
+        WHERE user_name LIKE CONCAT('%', #{value}, '%')
     </select>
 
     <update id="updateUser" parameterType="User">

@@ -74,7 +74,13 @@
     <select id="searchBlog" resultMap="Blog">
         SELECT blog_id,blog_title,LEFT (blog_body,150) AS blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
-        WHERE ( b.blog_title LIKE '%${searchText}%' OR b.blog_body LIKE '%${searchText}%') AND b.blog_state = 1
+        WHERE ( b.blog_title LIKE CONCAT('%'
+            , #{searchText}
+            , '%')
+           OR b.blog_body LIKE CONCAT('%'
+            , #{searchText}
+            , '%'))
+          AND b.blog_state = 1
         ORDER BY blog_time DESC
         LIMIT #{start},#{showCount}
     </select>
@@ -82,7 +88,8 @@
     <select id="getSearchBlogCount" parameterType="String" resultType="Long">
         SELECT COUNT(1)
         FROM blog
-        WHERE ( blog_title LIKE '%${value}%' OR blog_body LIKE '%${value}%') AND blog_state = 1
+        WHERE (blog_title LIKE CONCAT('%', #{value}, '%') OR blog_body LIKE CONCAT('%', #{value}, '%'))
+          AND blog_state = 1
     </select>
 
     <select id="findAllblog" resultMap="Blog">
@@ -133,13 +140,13 @@
     <select id="getSearchAllBlogCount" parameterType="String" resultType="Long">
         SELECT COUNT(1)
         FROM blog
-        WHERE blog_title LIKE '%${value}%'
+        WHERE blog_title LIKE CONCAT('%', #{value}, '%')
     </select>
 
     <select id="searchAllBlog" resultMap="Blog">
         SELECT blog_id,blog_title,LEFT (blog_body,150) AS blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
-        WHERE blog_title LIKE '%${searchText}%'
+        WHERE blog_title LIKE CONCAT('%', #{searchText}, '%')
         ORDER BY blog_state DESC,blog_time DESC
         LIMIT #{start},#{showCount}
     </select>
