@@ -70,6 +70,15 @@ public interface BlogDao {
     List<Blog> findHomeBlog(@Param("start") Integer start, @Param("showCount") Integer showCount);
 
     /**
+     * 查询Bug页博客
+     *
+     * @param start
+     * @param showCount
+     * @return
+     */
+    List<Blog> findBugBlog(@Param("start") Integer start, @Param("showCount") Integer showCount);
+
+    /**
      * 查询热门博文
      *
      * @param count 显示数量
@@ -179,4 +188,15 @@ public interface BlogDao {
     * @Date: 2020/5/30/0030 15:29
     */
     Integer getBlogLikeCountByBlogId(Integer blogId);
+
+    /**
+     * @Description: 获取Bug页博客数
+     * @Param: []
+     * @return: java.lang.Long
+     * @Author: fm
+     * @Date: 2023/12/12 15:10
+     */
+    Long getBugBlogCount();
+
+    int findBlogTagById(Integer tagId);
 }

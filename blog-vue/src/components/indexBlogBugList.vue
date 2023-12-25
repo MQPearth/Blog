@@ -1,17 +1,16 @@
 <template>
-  <div id="myBlogList">
-    <div v-for="blog in blogList">
-      <blogOverView :id="blog.id" :title="blog.title" :body="blog.body" :time="getTime(blog.time)"
+  <div id="indexBlogList" v-loading="loading">
+    <div>
+      <blogOverView v-for="blog in blogList" :key="blog.id" :id="blog.id" :title="blog.title"
+                    :body="blog.body" :time="getTime(blog.time)"
                     :blogViews="blog.blogViews"
                     :discussCount="blog.discussCount" :tags="catchTagName(blog.tags)"
                     :name="blog.user.name" :icon="blog.user.icon"/>
     </div>
 
-    <el-card class="box-card" style="margin: 20% " v-if="blogList.length <= 0">
-      <div >
-        还没发布过博客
-      </div>
-    </el-card>
+    <div v-if="loading" style="margin: 35% 0">
+
+    </div>
 
 
     <div>
@@ -35,14 +34,15 @@
   import date from '@/utils/date'
 
   export default {
-    name: 'myBlogList',
+    name: 'indexBlogList',
     components: {blogOverView},
     data() {
       return {
         total: 0,        //数据总数
         blogList: [],   //当前页数据
         pageSize: 5,    //每页显示数量
-        currentPage: 1   //当前页数
+        currentPage: 1,   //当前页数
+        loading: true
       }
     },
     created() {
@@ -53,6 +53,7 @@
         return date.timeago(time);
       },
       catchTagName(tag) { //从tag对象数组中拿到tag.Name属性
+
         var tagNames = [];
         for (var i = 0; i < tag.length; i++) {
           tagNames.push(tag[i].name)
@@ -65,16 +66,20 @@
         scrollTo(0, 0);
       },
       loadBlog() { //加载数据
-        blog.getMyBlog(this.currentPage, this.pageSize).then(responese => {
+        blog.getBlogBug(this.currentPage, this.pageSize).then(responese => {
           this.total = responese.data.total;
           this.blogList = responese.data.rows;
+
+          this.loading = false;
         });
+
       }
     }
   }
 </script>
 <style scoped>
-  #myBlogList {
+  #indexBlogList {
+    text-align: center;
     margin-top: -13px;
   }
 </style>

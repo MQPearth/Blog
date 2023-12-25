@@ -381,11 +381,13 @@
     margin: 20px 5% 0 5%;
     padding: 20px;
     text-align: left;
+    margin-top: 81px;
   }
 
   #editor {
     margin: 2% 2%;
     height: 100%;
+    position: inherit;
   }
 
   #discuss {

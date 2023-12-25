@@ -16,6 +16,7 @@
         <result property="user.id" column="user_id"/>
         <result property="user.name" column="user_name"/>
         <result property="user.reward" column="user_reward"/>
+        <result property="user.icon" column="user_icon"/>
         <result property="likeCount" column="like_count"/>
     </resultMap>
 
@@ -30,13 +31,13 @@
     </insert>
 
     <select id="findBlogById" parameterType="Integer" resultMap="Blog">
-        SELECT blog_id,blog_title,blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_reward,like_count
+        SELECT blog_id,blog_title,blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_reward,u.user_icon,like_count
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
         WHERE blog_id = #{value} AND b.blog_state = 1
     </select>
 
     <select id="findBlogByUserId" resultMap="Blog">
-        SELECT blog_id,blog_title,LEFT (blog_body,150) AS blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        SELECT blog_id,blog_title,LEFT (blog_body,150) AS blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_icon
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
         WHERE u.user_id = #{id} AND b.blog_state = 1
         ORDER BY blog_time DESC
@@ -56,7 +57,7 @@
     </select>
 
     <select id="findHomeBlog" resultMap="Blog">
-        SELECT blog_id,blog_title, blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_reward
+        SELECT blog_id,blog_title, blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_reward,u.user_icon
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
         WHERE b.blog_state = 1
         ORDER BY blog_time DESC
@@ -64,7 +65,7 @@
     </select>
 
     <select id="findHotBlog" parameterType="Integer" resultMap="Blog">
-        SELECT blog_id,blog_title, blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_reward
+        SELECT blog_id,blog_title, blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_reward,u.user_icon
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
         WHERE blog_state = 1
         ORDER BY blog_blogViews DESC,blog_discussCount DESC
@@ -72,7 +73,7 @@
     </select>
 
     <select id="searchBlog" resultMap="Blog">
-        SELECT blog_id,blog_title,LEFT (blog_body,150) AS blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        SELECT blog_id,blog_title,LEFT (blog_body,150) AS blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_icon
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
         WHERE ( b.blog_title LIKE CONCAT('%'
             , #{searchText}
@@ -93,7 +94,7 @@
     </select>
 
     <select id="findAllblog" resultMap="Blog">
-        SELECT blog_id,blog_title,LEFT (blog_body,150) AS blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        SELECT blog_id,blog_title,LEFT (blog_body,150) AS blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_icon
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
         ORDER BY blog_state DESC,blog_time DESC
         LIMIT #{start},#{showCount}
@@ -144,7 +145,7 @@
     </select>
 
     <select id="searchAllBlog" resultMap="Blog">
-        SELECT blog_id,blog_title,LEFT (blog_body,150) AS blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name
+        SELECT blog_id,blog_title,LEFT (blog_body,150) AS blog_body,blog_discussCount,blog_blogViews,blog_time,blog_state,b.user_id,u.user_name,u.user_icon
         FROM blog b LEFT JOIN user u on b.user_id = u.user_id
         WHERE blog_title LIKE CONCAT('%', #{searchText}, '%')
         ORDER BY blog_state DESC,blog_time DESC
@@ -174,6 +175,28 @@
     <select id="getBlogLikeCountByBlogId" parameterType="int" resultType="int">
         SELECT like_count FROM blog
         WHERE blog_id = #{blogId}
+    </select>
+    <select id="getBugBlogCount" resultType="Long">
+        SELECT count(1)
+        FROM blog
+        LEFT JOIN blog_tag ON blog_tag.blog_id = blog.blog_id
+        LEFT JOIN tag ON tag.tag_id = blog_tag.tag_id
+        WHERE blog.blog_state = 1 AND tag.tag_name = 'BUG'
+    </select>
+    <select id="findBugBlog" resultMap="Blog">
+        SELECT b.blog_id,b.blog_title, b.blog_body,b.blog_discussCount,b.blog_blogViews,b.blog_time,b.blog_state,b.user_id,u.user_name,u.user_reward,u.user_icon
+        FROM blog b
+        LEFT JOIN user u on b.user_id = u.user_id
+        LEFT JOIN blog_tag ON blog_tag.blog_id = b.blog_id
+        LEFT JOIN tag ON tag.tag_id = blog_tag.tag_id
+        WHERE b.blog_state = 1 AND tag.tag_name = 'BUG'
+        ORDER BY blog_time DESC
+            LIMIT #{start},#{showCount}
+    </select>
+    <select id="findBlogTagById" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM tag
+        WHERE tag.tag_id = #{tagId} AND tag.tag_name = 'BUG'
     </select>
 
 </mapper>

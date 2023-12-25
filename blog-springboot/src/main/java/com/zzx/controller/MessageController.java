@@ -27,6 +27,7 @@ public class MessageController {
 
     @ApiOperation(value = "留言", notes = "留言内容")
     @PostMapping
+    @PreAuthorize("hasAuthority('USER')")
     public Result message(String messageBody) {
         if (!formatUtil.checkStringNull(messageBody)) {
             return Result.create(StatusCode.ERROR, "参数错误");

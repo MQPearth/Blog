@@ -20,6 +20,12 @@ export default {
       method: 'get'
     })
   },
+  getBlogBug(page, showCount) {
+    return request({
+      url: '/blog/bug/' + page + '/' + showCount,
+      method: 'get'
+    })
+  },
   getBlogById(id, isClick) {
     return request({
       url: '/blog/' + id + '/' + isClick,

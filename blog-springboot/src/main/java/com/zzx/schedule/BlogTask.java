@@ -132,4 +132,33 @@ public class BlogTask {
 
         }
     }
+
+    /**
+     * 更新bug博客列表
+     *
+     * @throws JsonProcessingException
+     */
+    public void updateRedisBugBlogList(Integer delBlogId) throws JsonProcessingException {
+        List<String> bugBlogIds = redisTemplate.opsForList().range(RedisConfig.REDIS_BUG_BLOG, 0, RedisConfig.REDIS_BUG_BLOG_COUNT - 1);
+        assert bugBlogIds != null;
+        if (!bugBlogIds.contains(delBlogId + "")) {
+            //bug列表缓存中没有这个要删除的blogId，直接返回
+            return;
+        }
+        // 删除键值
+        redisTemplate.delete(RedisConfig.REDIS_BUG_BLOG);
+        // 先查询数据库
+        List<Blog> bugBlog = blogDao.findBugBlog(0, 10);
+
+        for (Blog blog : bugBlog) {
+            blog.setTags(tagDao.findTagByBlogId(blog.getId()));
+            // 向bug 集合中存 id
+            String blogId = Integer.toString(blog.getId());
+
+            redisTemplate.opsForList().rightPush(RedisConfig.REDIS_BUG_BLOG, blogId);
+            // 存具体的blog对象
+            redisTemplate.opsForValue().set(RedisConfig.REDIS_BLOG_PREFIX + blogId, objectMapper.writeValueAsString(blog));
+
+        }
+    }
 }

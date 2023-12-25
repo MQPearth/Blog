@@ -7,6 +7,7 @@ import com.zzx.model.entity.Result;
 import com.zzx.model.entity.StatusCode;
 
 import com.zzx.model.pojo.User;
+import com.zzx.model.vo.UserUrlVO;
 import com.zzx.service.LoginService;
 import com.zzx.service.RoleService;
 import com.zzx.service.UserService;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 
 @Api(tags = "用户api", description = "用户api", basePath = "/user")
@@ -68,7 +68,7 @@ public class UserController {
         }
 
         try {
-            Map map = userService.login(user);
+            Map<String, Object> map = userService.login(user);
             loginService.saveLoginInfo(user);
             return Result.create(StatusCode.OK, "登录成功", map);
         } catch (UsernameNotFoundException unfe) {
@@ -205,19 +205,19 @@ public class UserController {
     }
 
     /**
-     * 更新用户打赏码
+     * 更新用户ImageUrl(打赏码、头像)
      *
      * @return
      */
-    @ApiOperation(value = "更新用户打赏码", notes = "更新用户打赏码")
+    @ApiOperation(value = "更新用户ImageUrl", notes = "更新用户ImageUrl")
     @PreAuthorize("hasAuthority('USER')")
-    @PutMapping("/updateReward")
-    public Result updateReward(String imgPath) {
-        if (!formatUtil.checkStringNull(imgPath)) {
+    @PostMapping("/updateUserUrl")
+    public Result updateReward(UserUrlVO userUrlVO) {
+        if (!formatUtil.checkStringNull(userUrlVO.getIconImgPath()) && !formatUtil.checkStringNull(userUrlVO.getRewardImgPath())) {
             return Result.create(StatusCode.ERROR, "格式错误");
         }
-        userService.updateUserReward(imgPath);
-        return Result.create(StatusCode.OK, "更新成功");
+        Map<String, Object> map = userService.updateUserUrl(userUrlVO);
+        return Result.create(StatusCode.OK, "更新成功", map);
     }
 
 
@@ -243,6 +243,18 @@ public class UserController {
     @GetMapping("/getReward")
     public Result getUserReward() {
         return Result.create(StatusCode.OK, "查询成功", userService.findUserReward());
+    }
+
+    /**
+     * 获取用户的头像
+     *
+     * @return
+     */
+    @ApiOperation(value = "获取用户的头像", notes = "获取用户的头像")
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping("/getIcon")
+    public Result getUserIcon() {
+        return Result.create(StatusCode.OK, "查询成功", userService.findUserIcon());
     }
 
     /**

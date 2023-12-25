@@ -177,6 +177,7 @@ CREATE TABLE `user` (
   `user_mail` varchar(50) NOT NULL COMMENT '用户邮箱',
   `user_state` int(11) NOT NULL COMMENT '用户状态 0 封禁 1正常',
   `user_reward` varchar(255) DEFAULT NULL COMMENT '用户打赏码图片路径',
+  `user_icon` varchar(255) DEFAULT NULL COMMENT '用户头像图片路径',
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 

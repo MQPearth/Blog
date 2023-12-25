@@ -42,6 +42,9 @@ public class User implements Serializable {
     @ApiModelProperty(value = "打赏码路径", dataType = "String")
     private String reward;
 
+    @ApiModelProperty(value = "头像路径", dataType = "String")
+    private String icon;
+
     @ApiModelProperty(hidden = true)
     @JsonIgnore
     private List<Role> roles;
