@@ -1,6 +1,7 @@
 package com.zzx.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zzx.config.JwtConfig;
 import com.zzx.config.MailConfig;
 import com.zzx.config.RabbitMqConfig;
@@ -12,9 +13,13 @@ import com.zzx.model.entity.StatusCode;
 import com.zzx.model.pojo.Code;
 import com.zzx.model.pojo.Role;
 import com.zzx.model.pojo.User;
+import com.zzx.model.vo.UserUrlVO;
+import com.zzx.schedule.BlogTask;
 import com.zzx.utils.DateUtil;
+import com.zzx.utils.FormatUtil;
 import com.zzx.utils.JwtTokenUtil;
 import com.zzx.utils.RandomUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,6 +39,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
+@Slf4j
 @Service
 @SuppressWarnings("NRServiceOrDaoClassShouldEndWithImpl")
 public class UserService implements UserDetailsService {
@@ -82,7 +88,11 @@ public class UserService implements UserDetailsService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private FormatUtil formatUtil;
 
+    @Autowired
+    private BlogTask blogTask;
     /**
      * 登录
      * 返回token，用户名，用户角色
@@ -90,7 +100,7 @@ public class UserService implements UserDetailsService {
      * @param user
      * @return
      */
-    public Map login(User user) throws UsernameNotFoundException, RuntimeException {
+    public Map<String, Object> login(User user) throws UsernameNotFoundException, RuntimeException {
 
         User dbUser = this.findUserByName(user.getName());
         //此用户不存在 或 密码错误
@@ -112,11 +122,12 @@ public class UserService implements UserDetailsService {
             roles.add(authority.getAuthority());
         }
 
-        Map<String, Object> map = new HashMap<>(3);
+        Map<String, Object> map = new HashMap<>(4);
 
         map.put("token", jwtConfig.getPrefix() + token);
         map.put("name", user.getName());
         map.put("roles", roles);
+        map.put("icon", dbUser.getIcon());
 
         //将token存入redis 过期时间 jwtConfig.time 单位[s]
         redisTemplate.opsForValue().
@@ -298,9 +309,9 @@ public class UserService implements UserDetailsService {
         }
 
         //校验邮箱验证码
-        if (!checkMailCode(user.getMail(), code)) {
+        /*if (!checkMailCode(user.getMail(), code)) {
             throw new RuntimeException("验证码无效");
-        }
+        }*/
         //更新密码
         user.setPassword(encoder.encode(newPassword));
         userDao.updateUser(user);
@@ -494,14 +505,32 @@ public class UserService implements UserDetailsService {
         return user.getReward();
     }
 
+    public String findUserIcon() {
+        User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
+        return user.getIcon();
+    }
+
     /**
      * 更改用户打赏码
      *
      * @param imgPath
      */
+    @Transactional(rollbackFor = Exception.class)
     public void updateUserReward(String imgPath) {
         User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
         user.setReward(imgPath);
+        userDao.updateUser(user);
+    }
+
+    /**
+     * 更改用户头像
+     *
+     * @param imgPath
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserIcon(String imgPath) {
+        User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
+        user.setIcon(imgPath);
         userDao.updateUser(user);
     }
 
@@ -528,5 +557,36 @@ public class UserService implements UserDetailsService {
                 .set(MailConfig.REDIS_MAIL_KEY_PREFIX + mail,
                         code + MailConfig.MAIL_STATE_MID_CHAR + state,
                         MailConfig.EXPIRED_TIME, TimeUnit.MINUTES);
+    }
+
+    /**
+     * 更改用户头像和赞助码
+     *
+     * @param userUrlVO 用户url类
+     * @return map对象
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> updateUserUrl(UserUrlVO userUrlVO) {
+        User user = userDao.findUserByName(jwtTokenUtil.getUsernameFromRequest(request));
+        if (formatUtil.checkStringNull(userUrlVO.getIconImgPath())) {
+            //改Icon的
+            user.setIcon(userUrlVO.getIconImgPath());
+        }
+        if (formatUtil.checkStringNull(userUrlVO.getRewardImgPath())) {
+            //改Reward的
+            user.setReward(userUrlVO.getRewardImgPath());
+        }
+        userDao.updateUser(user);
+        //刷新缓存
+        try {
+            blogTask.updateRedisNewBlogList();
+            blogTask.updateRedisHotBlogList();
+        } catch (JsonProcessingException e) {
+            log.error("更新头像、赞助码后，博客缓存更新失败");
+        }
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("reward", user.getReward());
+        map.put("icon", user.getIcon());
+        return map;
     }
 }

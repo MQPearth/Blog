@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 99%">
+  <div style="width: 99%;margin-top: 81px;">
     <el-container>
       <el-aside style="width: 20%; margin-bottom: -3%">
         <div id="aside">

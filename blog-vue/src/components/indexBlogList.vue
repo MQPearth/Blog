@@ -5,7 +5,7 @@
                     :body="blog.body" :time="getTime(blog.time)"
                     :blogViews="blog.blogViews"
                     :discussCount="blog.discussCount" :tags="catchTagName(blog.tags)"
-                    :name="blog.user.name"/>
+                    :name="blog.user.name" :icon="blog.user.icon"/>
     </div>
 
     <div v-if="loading" style="margin: 35% 0">

@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import index from '@/views/index'
 import message from '@/views/message'
 import announcement from '@/views/announcement'
+import bug from '@/views/indexBug'
 import newBlog from '@/views/newBlog'
 import account from '@/views/account'
 import admins from '@/views/admins'
@@ -33,6 +34,11 @@ export default new Router({
       path: '/message',
       name: 'message',
       component: message
+    },
+    {
+      path: '/bug',
+      name: 'bug',
+      component: bug
     },
     {
       path: '/announcement',

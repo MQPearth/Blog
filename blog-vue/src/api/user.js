@@ -43,16 +43,23 @@ export default {
       method: 'get',
     })
   },
-  updateReward(filePath) {
+  updateUserUrl(rewardImgPath, iconImgPath) {
     return request({
-      url: '/user/updateReward',
-      method: 'put',
-      data: qs.stringify({'imgPath': filePath})
+      url: '/user/updateUserUrl',
+      method: 'post',
+      header: 'Content-Type:application/json',
+      data: qs.stringify({'rewardImgPath': rewardImgPath, 'iconImgPath': iconImgPath})
     })
   },
   getUserReward() {
     return request({
       url: '/user/getReward',
+      method: 'get',
+    })
+  },
+  getUserIcon() {
+    return request({
+      url: '/user/getIcon',
       method: 'get',
     })
   },

@@ -86,6 +86,7 @@
 <style scoped>
   #announcement {
     margin: 10px 5% 0 5%;
+    margin-top: 81px;
   }
 
   .subscript {

@@ -1,10 +1,10 @@
 <template>
   <div>
     <div style="text-align: right;margin-bottom: 5px">
-      <el-button style="width: 7%;text-align: center" v-if="searchFlag == true" @click="returnNormal()">返回</el-button>
-
+      <!-- <el-button style="width: 7%;text-align: center" v-if="searchFlag == true" @click="returnNormal()">返回</el-button> -->
+      <span style="font-size: x-small;color: dimgrey;float: left;">标签管理在【头像】-【我的博客】-<router-link to="/myBlog"><span class="one"><span class="two">【右下角个人标签】</span></span></router-link></span>
       <el-input placeholder="模糊查询标题" v-model="searchName" suffix-icon="el-icon-search"
-                style="width: 30%;" @keyup.enter.native="searchSubmit"/>
+                style="width: 30%;float: right;top: -10px;" @keyup.enter.native="searchSubmit"/>
     </div>
     <div v-loading="loading">
       <el-table :data="blogData" style="width: 100%" :border="true">
@@ -148,3 +148,11 @@
     }
   }
 </script>
+<style>
+  a{
+    text-decoration: none;
+  }
+  .router-link-active {
+    text-decoration: none;
+  }
+</style>

@@ -30,5 +30,6 @@
 <style scoped>
   #myBlog{
     margin: auto 1%;
+    margin-bottom: 40px;
   }
 </style>

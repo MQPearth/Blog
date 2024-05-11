@@ -2,17 +2,13 @@
   <div>
     <el-container>
       <el-main style="width: 75%;margin-bottom: 40px;">
-        <indexBlogList/>
+        <indexBlogBugList/>
       </el-main>
       <el-aside id="aside" style="width: 20%;margin-top: 11px;margin-bottom: 40px;" class="hidden-xs-only">
         <div style="margin: 10px" >
-          <!-- 介绍 -->
           <introduction/>
-          <!-- 最新评论 -->
           <!-- <newDiscuss/> -->
-          <!-- 热门文章 -->
           <hotBlog/>
-          <!-- 文章归档 -->
           <statisticalBlog/>
         </div>
       </el-aside>
@@ -24,13 +20,13 @@
   import newDiscuss from '@/components/newDiscuss'
   import hotBlog from '@/components/hotBlog'
   import statisticalBlog from '@/components/statisticalBlog'
-  import indexBlogList from '@/components/indexBlogList'
+  import indexBlogBugList from '@/components/indexBlogBugList'
 
   import 'element-ui/lib/theme-chalk/display.css';
 
   export default {
     name: 'index',
-    components: {introduction, newDiscuss, hotBlog, statisticalBlog, indexBlogList}
+    components: {introduction, newDiscuss, hotBlog, statisticalBlog, indexBlogBugList}
   }
 </script>
 <style scoped>
