@@ -38,7 +38,7 @@
 * 实时日志 ![实时日志](img/log.png)
 
 #### docker 部署教程
-[Docker 部署本站 详细全过程 附代码](https://blog.22xcode.com/post/12)
+[Docker 部署本站 详细全过程 附代码](https://blog.22xcode.com/article/537088126162567169)
 
 ##### Tips
 
